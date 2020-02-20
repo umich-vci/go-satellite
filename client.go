@@ -410,7 +410,7 @@ func NewGetOrganizationsRequest(server string, params *GetOrganizationsParams) (
 		return nil, err
 	}
 
-	basePath := fmt.Sprintf("/organizations")
+	basePath := fmt.Sprintf("/katello/api/organizations")
 	if basePath[0] == '/' {
 		basePath = basePath[1:]
 	}
@@ -596,7 +596,7 @@ func NewCreateOrganizationRequestWithBody(server string, contentType string, bod
 		return nil, err
 	}
 
-	basePath := fmt.Sprintf("/organizations")
+	basePath := fmt.Sprintf("/katello/api/organizations")
 	if basePath[0] == '/' {
 		basePath = basePath[1:]
 	}
@@ -631,7 +631,7 @@ func NewDeleteOrganizationRequest(server string, id int, params *DeleteOrganizat
 		return nil, err
 	}
 
-	basePath := fmt.Sprintf("/organizations/%s", pathParam0)
+	basePath := fmt.Sprintf("/katello/api/organizations/%s", pathParam0)
 	if basePath[0] == '/' {
 		basePath = basePath[1:]
 	}
@@ -701,7 +701,7 @@ func NewGetOrganizationByIdRequest(server string, id int, params *GetOrganizatio
 		return nil, err
 	}
 
-	basePath := fmt.Sprintf("/organizations/%s", pathParam0)
+	basePath := fmt.Sprintf("/katello/api/organizations/%s", pathParam0)
 	if basePath[0] == '/' {
 		basePath = basePath[1:]
 	}
@@ -782,7 +782,7 @@ func NewUpdateOrganizationRequestWithBody(server string, id int, contentType str
 		return nil, err
 	}
 
-	basePath := fmt.Sprintf("/organizations/%s", pathParam0)
+	basePath := fmt.Sprintf("/katello/api/organizations/%s", pathParam0)
 	if basePath[0] == '/' {
 		basePath = basePath[1:]
 	}

@@ -5,10 +5,7 @@ info:
   description: "\n<p>Satellite API v2 is currently the default API version.</p>\n"
   version: '2'
 servers:
-  - url: https://{satellite_host}/api
-    variables:
-      satellite_host:
-        default: satellite.example.com
+  - url: https://satellite.example.com
 components:
   securitySchemes:
     BasicAuth:
@@ -362,12 +359,7 @@ components:
 security:
   - basicAuth: []
 paths: 
-  /organizations:
-    servers:
-      - url: https://{satellite_host}/katello/api
-        variables:
-          satellite_host:
-            default: satellite.example.com
+  /katello/api/organizations:
     get: 
       tags: 
         - organizations
@@ -455,12 +447,7 @@ paths:
               schema: 
                 $ref: '#/components/schemas/Error'
       description: ''
-  /organizations/{id}:
-    servers:
-      - url: https://{satellite_host}/katello/api
-        variables:
-          satellite_host:
-            default: satellite.example.com
+  /katello/api/organizations/{id}:
     get: 
       tags: 
         - organizations
