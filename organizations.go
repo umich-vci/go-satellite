@@ -117,7 +117,7 @@ type orgSubnet struct {
 }
 
 type orgTemplate struct {
-	ID               *string `json:"id"`
+	ID               *int    `json:"id"`
 	Name             *string `json:"name"`
 	TemplateKindID   *int    `json:"template_kind_id"`
 	TemplateKindName *string `json:"template_kind_name"`
