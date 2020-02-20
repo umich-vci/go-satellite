@@ -42,31 +42,35 @@ type orgOwnerUpstreamConsumer struct {
 	IDCert            *orgOwnerUpstreamConsumerIDCert `json:"idCert"`
 	Name              *string                         `json:"name"`
 	OwnerID           *string                         `json:"ownerId"`
-	Type              *struct {
-		ID       *string `json:"id"`
-		Label    *string `json:"label"`
-		Manifest *bool   `json:"manifest"`
-	} `json:"type"`
-	Updated *string `json:"updated"`
-	UUID    *string `json:"uuid"`
-	WebURL  *string `json:"webUrl"`
+	Type              *orgOwnerUpstreamConsumerType   `json:"type"`
+	Updated           *string                         `json:"updated"`
+	UUID              *string                         `json:"uuid"`
+	WebURL            *string                         `json:"webUrl"`
 }
 
 type orgOwnerUpstreamConsumerIDCert struct {
-	Cert    *string `json:"cert"`
-	Created *string `json:"created"`
-	ID      *string `json:"id"`
-	Key     *string `json:"key"`
-	Serial  *struct {
-		Collected  *bool   `json:"collected"`
-		Created    *string `json:"created"`
-		Expiration *string `json:"expiration"`
-		ID         *int    `json:"id"`
-		Revoked    *bool   `json:"revoked"`
-		Serial     *int    `json:"serial"`
-		Updated    *string `json:"updated"`
-	} `json:"serial"`
-	Updated *string `json:"updated"`
+	Cert    *string                               `json:"cert"`
+	Created *string                               `json:"created"`
+	ID      *string                               `json:"id"`
+	Key     *string                               `json:"key"`
+	Serial  *orgOwnerUpstreamConsumerIDCertSerial `json:"serial"`
+	Updated *string                               `json:"updated"`
+}
+
+type orgOwnerUpstreamConsumerIDCertSerial struct {
+	Collected  *bool   `json:"collected"`
+	Created    *string `json:"created"`
+	Expiration *string `json:"expiration"`
+	ID         *int    `json:"id"`
+	Revoked    *bool   `json:"revoked"`
+	Serial     *int    `json:"serial"`
+	Updated    *string `json:"updated"`
+}
+
+type orgOwnerUpstreamConsumerType struct {
+	ID       *string `json:"id"`
+	Label    *string `json:"label"`
+	Manifest *bool   `json:"manifest"`
 }
 
 type orgParameter struct {
