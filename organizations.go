@@ -216,7 +216,7 @@ type Organizations interface {
 	CreateOrganization(ctx context.Context, orgCreate OrganizationCreate) (*Organization, *http.Response, error)
 	DeleteOrganization(ctx context.Context, orgID int) (*http.Response, error)
 	GetOrganizationByID(ctx context.Context, orgID int) (*Organization, *http.Response, error)
-	UpdateOrganization(ctx context.Context, orgID int, update *OrganizationUpdate) (*Organization, *http.Response, error)
+	UpdateOrganization(ctx context.Context, orgID int, update OrganizationUpdate) (*Organization, *http.Response, error)
 }
 
 // OrganizationsOp handles communication with the Organization related methods of the
@@ -276,7 +276,7 @@ func (s *OrganizationsOp) GetOrganizationByID(ctx context.Context, orgID int) (*
 }
 
 // UpdateOrganization the settings of an organization by its ID
-func (s *OrganizationsOp) UpdateOrganization(ctx context.Context, orgID int, update *OrganizationUpdate) (*Organization, *http.Response, error) {
+func (s *OrganizationsOp) UpdateOrganization(ctx context.Context, orgID int, update OrganizationUpdate) (*Organization, *http.Response, error) {
 	path := katelloBasePath + "/organizations/" + strconv.Itoa(orgID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, update)
