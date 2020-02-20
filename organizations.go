@@ -16,22 +16,22 @@ type orgCompRes struct {
 }
 
 type orgOwnerDetails struct {
-	AutobindDisabled      *bool                       `json:"autobindDisabled"`
-	ContentAccessMode     *string                     `json:"contentAccessMode"`
-	ContentAccessModeList *string                     `json:"contentAccessModeList"`
-	ContentPrefix         *string                     `json:"contentPrefix"`
-	Created               *string                     `json:"created"`
-	DefaultServiceLevel   *string                     `json:"defaultServiceLevel"`
-	DisplayName           *string                     `json:"displayName"`
-	Href                  *string                     `json:"href"`
-	ID                    *string                     `json:"id"`
-	Key                   *string                     `json:"key"`
-	LastRefreshed         *string                     `json:"lastRefreshed"`
-	LogLevel              *string                     `json:"logLevel"`
-	ParentOwner           *string                     `json:"parentOwner"`
-	Updated               *string                     `json:"updated"`
-	UpstreamConsumer      *[]orgOwnerUpstreamConsumer `json:"upstreamConsumer"`
-	VirtWho               *bool                       `json:"virt_who"`
+	AutobindDisabled      *bool                     `json:"autobindDisabled"`
+	ContentAccessMode     *string                   `json:"contentAccessMode"`
+	ContentAccessModeList *string                   `json:"contentAccessModeList"`
+	ContentPrefix         *string                   `json:"contentPrefix"`
+	Created               *string                   `json:"created"`
+	DefaultServiceLevel   *string                   `json:"defaultServiceLevel"`
+	DisplayName           *string                   `json:"displayName"`
+	Href                  *string                   `json:"href"`
+	ID                    *string                   `json:"id"`
+	Key                   *string                   `json:"key"`
+	LastRefreshed         *string                   `json:"lastRefreshed"`
+	LogLevel              *string                   `json:"logLevel"`
+	ParentOwner           *string                   `json:"parentOwner"`
+	Updated               *string                   `json:"updated"`
+	UpstreamConsumer      *orgOwnerUpstreamConsumer `json:"upstreamConsumer"`
+	VirtWho               *bool                     `json:"virt_who"`
 }
 
 type orgOwnerUpstreamConsumer struct {
