@@ -1,0 +1,567 @@
+---
+openapi: 3.0.0
+info:
+  title: Red Hat Satellite
+  description: "\n<p>Satellite API v2 is currently the default API version.</p>\n"
+  version: '2'
+servers:
+  - url: https://{satellite_host}/api
+    variables:
+      satellite_host:
+        default: satellite.example.com
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+  schemas:
+      # Schema for error response body
+      Error:
+        type: object
+        properties:
+          error:
+            type: object
+            properties:
+              full_messages:
+                type: string
+        required:
+          - error
+      # Schema for response from organization/{id}
+      Organization: 
+        type: "object"
+        properties: 
+          ancestry: 
+            type: "string"
+          compute_resources: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id: 
+                  type: "integer"
+          config_templates: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id: 
+                  type: "integer"
+                name: 
+                  type: "string"
+                template_kind_id: 
+                  type: "integer"
+                template_name: 
+                  type: "string"
+          created_at: 
+            type: "string"
+          description: 
+            type: "string"
+          domains: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id: 
+                  type: "integer"
+          environments: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id: 
+                  type: "integer"
+          hostgroups: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id: 
+                  type: "integer"
+          hosts_count: 
+            type: "integer"
+          id: 
+            type: "integer"
+          locations: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                description: 
+                  type: "string"
+                id: 
+                  type: "integer"
+                name: 
+                  type: "string"
+                title: 
+                  type: "string"
+          media: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id: 
+                  type: "integer"
+          name: 
+            type: "string"
+          parameters: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                priority: 
+                  type: "integer"
+                created_at: 
+                  type: "string"
+                updated_at: 
+                  type: "string"
+                id: 
+                  type: "integer"
+                name: 
+                  type: "string"
+                parameter_type: 
+                  type: "string"
+                value: 
+                  type: "string"
+          parent_id: 
+            type: "integer"
+          parent_name: 
+            type: "string"
+          provisioning_templates: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id: 
+                  type: "integer"
+          ptables: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                created_at: 
+                  type: "string"
+                id: 
+                  type: "integer"
+                name: 
+                  type: "string"
+                os_family: 
+                  type: "string"
+                updated_at: 
+                  type: "string"
+          realms: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id: 
+                  type: "integer"
+          select_all_types: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id: 
+                  type: "integer"
+          smart_proxies: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id: 
+                  type: "integer"
+                name: 
+                  type: "string"
+                url: 
+                  type: "string"
+          subnets: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id: 
+                  type: "integer"
+          title: 
+            type: "string"
+          updated_at: 
+            type: "string"
+          users: 
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                description: 
+                  type: "string"
+                id: 
+                  type: "integer"
+                login: 
+                  type: "string"
+      # Schema for body to POST to organization
+      OrganizationCreate:
+        type: object
+        required:
+          - organization
+        properties:
+          organization:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+                x-nullable: true
+              user_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              smart_proxy_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              compute_resource_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              medium_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              config_template_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              ptable_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              provisioning_template_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              domain_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              realm_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              hostgroup_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              environment_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              subnet_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              label:
+                type: string
+                x-nullable: true
+      # Schema for body to PUT to organization/{id}
+      OrganizationUpdate:
+        type: object
+        required:
+          - organization
+        properties:
+          redhat_repository_url:
+            type: string
+          organization:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+                x-nullable: true
+              user_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              smart_proxy_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              compute_resource_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              medium_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              config_template_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              ptable_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              provisioning_template_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              domain_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              realm_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              hostgroup_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              environment_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              subnet_ids:
+                type: array
+                items: 
+                  type: "integer"
+                x-nullable: true
+              parent_id:
+                type: integer
+                x-nullable: true
+              ignore_types:
+                type: array
+                items: 
+                  type: "string"
+                x-nullable: true
+
+security:
+  - basicAuth: []
+paths: 
+  /organizations:
+    servers:
+      - url: https://{satellite_host}/katello/api
+        variables:
+          satellite_host:
+            default: satellite.example.com
+    get: 
+      tags: 
+        - organizations
+      operationId: getOrganizations
+      summary: List all organizations
+      parameters: 
+        - name: location_id
+          schema:
+            type: integer
+          in: query
+          description: Scope by locations
+        - 
+          name: organization_id
+          schema:
+            type: integer
+          in: query
+          description: Scope by organizations
+        - name: search
+          schema:
+            type: string
+          in: query
+          description: Search string
+        - name: page
+          schema:
+            type: integer
+          in: query
+          description: Page number, starting at 1
+        - name: per_page
+          schema:
+            type: integer
+          in: query
+          description: Number of results per page to return
+        - name: order
+          schema:
+            type: string
+          in: query
+          description: Sort field and order, eg. 'id DESC'
+        - name: full_result
+          schema:
+            type: boolean
+          in: query
+          description: Whether or not to show all results
+        - name: sort_by
+          schema:
+            type: string
+          in: query
+          description: Field to sort the results on
+        - name: sort_order
+          schema:
+            type: string
+          in: query
+          description: How to order the sorted results (e.g. ASC for ascending)
+      responses: 
+        '200': 
+          description: ok
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Error'
+      description: ''
+    post: 
+      tags: 
+        - organizations
+      operationId: createOrganization
+      summary: Create organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationCreate'
+      responses: 
+        '201':
+          description: created
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Organization'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Error'
+      description: ''
+  /organizations/{id}:
+    servers:
+      - url: https://{satellite_host}/katello/api
+        variables:
+          satellite_host:
+            default: satellite.example.com
+    get: 
+      tags: 
+        - organizations
+      operationId: getOrganizationById
+      summary: Show organization
+      parameters: 
+        - name: id
+          schema:
+            type: integer
+          in: path
+          required: true
+          description: organization ID
+        - name: location_id
+          schema:
+            type: integer
+          in: query
+          description: Scope by locations
+        - name: organization_id
+          schema:
+            type: integer
+          in: query
+          description: Scope by organizations
+      responses: 
+        '200': 
+          description: ok
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Organization'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: ''
+    put: 
+      tags: 
+        - organizations
+      operationId: updateOrganization
+      summary: Update organization
+      requestBody:
+        description: The organization to update.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationUpdate'
+      parameters: 
+        - name: id
+          schema:
+            type: integer
+          in: path
+          required: true
+          description: organization ID
+      responses: 
+        '200': 
+          description: ok
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Organization'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: ''
+    delete: 
+      tags: 
+        - organizations
+      operationId: deleteOrganization
+      summary: Delete an organization
+      parameters: 
+        - name: id
+          schema:
+            type: integer
+          in: path
+          required: true
+          description: Organization ID
+        - name: location_id
+          schema:
+            type: integer
+          in: query
+          description: Scope by locations
+        - name: organization_id
+          schema:
+            type: integer
+          in: query
+          description: Scope by organizations
+      responses: 
+        '200': 
+          description: ok
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: ''
+tags: 
+  - name: organizations
+    description: ''
