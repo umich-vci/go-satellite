@@ -213,9 +213,10 @@ type OrganizationUpdate struct {
 // Organizations is an interface for interacting with
 // Red Hat Satellite organizations
 type Organizations interface {
-	DeleteOrganization(ctx context.Context, orgID int) (*http.Response, error)
 	CreateOrganization(ctx context.Context, orgCreate OrganizationCreate) (*Organization, *http.Response, error)
+	DeleteOrganization(ctx context.Context, orgID int) (*http.Response, error)
 	GetOrganizationByID(ctx context.Context, orgID int) (*Organization, *http.Response, error)
+	UpdateOrganization(ctx context.Context, orgID int, update *OrganizationUpdate) (*Organization, *http.Response, error)
 }
 
 // OrganizationsOp handles communication with the Organization related methods of the
@@ -275,19 +276,19 @@ func (s *OrganizationsOp) GetOrganizationByID(ctx context.Context, orgID int) (*
 }
 
 // UpdateOrganization the settings of an organization by its ID
-// func (s *OrganizationsOp) UpdateOrganization(ctx context.Context, orgID int, update *OrganizationUpdate) (*http.Response, error) {
-// 	path := katelloBasePath + "/organizations/" + strconv.Itoa(orgID)
+func (s *OrganizationsOp) UpdateOrganization(ctx context.Context, orgID int, update *OrganizationUpdate) (*Organization, *http.Response, error) {
+	path := katelloBasePath + "/organizations/" + strconv.Itoa(orgID)
 
-// 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, update)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	req, err := s.client.NewRequest(ctx, http.MethodPut, path, update)
+	if err != nil {
+		return nil, nil, err
+	}
 
-// 	root := new(registerClientRequestRoot)
-// 	resp, err := s.client.Do(ctx, req, root)
-// 	if err != nil {
-// 		return resp, err
-// 	}
+	org := new(Organization)
+	resp, err := s.client.Do(ctx, req, org)
+	if err != nil {
+		return nil, resp, err
+	}
 
-// 	return resp, err
-// }
+	return org, resp, err
+}
