@@ -30,7 +30,7 @@ type orgOwnerDetails struct {
 	LogLevel              *string                     `json:"logLevel"`
 	ParentOwner           *string                     `json:"parentOwner"`
 	Updated               *string                     `json:"updated"`
-	UpstreamConsumer      []*orgOwnerUpstreamConsumer `json:"upstreamConsumer"`
+	UpstreamConsumer      *[]orgOwnerUpstreamConsumer `json:"upstreamConsumer"`
 	VirtWho               *bool                       `json:"virt_who"`
 }
 
