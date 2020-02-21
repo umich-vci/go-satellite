@@ -89,7 +89,7 @@ type orgPtables struct {
 	UpdatedAt *string `json:"updated_at"`
 }
 
-type orgReference struct {
+type genericReference struct {
 	Description *string `json:"description"`
 	ID          *int    `json:"id"`
 	Name        *string `json:"name"`
@@ -129,31 +129,31 @@ type orgUser struct {
 
 // Organization defines model for an Organization.
 type Organization struct {
-	Ancestry              *string          `json:"ancestry"`
-	ComputeResources      *[]orgCompRes    `json:"compute_resources"`
-	ConfigTemplates       *[]orgTemplate   `json:"config_templates"`
-	CreatedAt             *string          `json:"created_at"`
-	DefaultContentViewID  *int             `json:"default_content_view_id"`
-	Description           *string          `json:"description"`
-	Domains               *[]orgShortRef   `json:"domains"`
-	Environments          *[]orgShortRef   `json:"environments"`
-	HostGroups            *[]orgReference  `json:"hostgroups"`
-	HostsCount            *int             `json:"hosts_count"`
-	ID                    *int             `json:"id"`
-	Label                 *string          `json:"label"`
-	LibraryID             *int             `json:"library_id"`
-	Locations             *[]orgReference  `json:"locations"`
-	Media                 *[]orgShortRef   `json:"media"`
-	Name                  *string          `json:"name"`
-	OwnerDetails          *orgOwnerDetails `json:"owner_details"`
-	Parameters            *[]orgParameter  `json:"parameters"`
-	ParentID              *int             `json:"parent_id"`
-	ParentName            *string          `json:"parent_name"`
-	ProvisioningTemplates *[]orgTemplate   `json:"provisioning_templates"`
-	Ptables               *[]orgPtables    `json:"ptables"`
-	//Realms                *[]orgReference  `json:"realms"`
+	Ancestry              *string             `json:"ancestry"`
+	ComputeResources      *[]orgCompRes       `json:"compute_resources"`
+	ConfigTemplates       *[]orgTemplate      `json:"config_templates"`
+	CreatedAt             *string             `json:"created_at"`
+	DefaultContentViewID  *int                `json:"default_content_view_id"`
+	Description           *string             `json:"description"`
+	Domains               *[]orgShortRef      `json:"domains"`
+	Environments          *[]orgShortRef      `json:"environments"`
+	HostGroups            *[]genericReference `json:"hostgroups"`
+	HostsCount            *int                `json:"hosts_count"`
+	ID                    *int                `json:"id"`
+	Label                 *string             `json:"label"`
+	LibraryID             *int                `json:"library_id"`
+	Locations             *[]genericReference `json:"locations"`
+	Media                 *[]orgShortRef      `json:"media"`
+	Name                  *string             `json:"name"`
+	OwnerDetails          *orgOwnerDetails    `json:"owner_details"`
+	Parameters            *[]orgParameter     `json:"parameters"`
+	ParentID              *int                `json:"parent_id"`
+	ParentName            *string             `json:"parent_name"`
+	ProvisioningTemplates *[]orgTemplate      `json:"provisioning_templates"`
+	Ptables               *[]orgPtables       `json:"ptables"`
+	//Realms                *[]genericReference  `json:"realms"`
 	RedHatRepositoryURL *string `json:"redhat_repository_url"`
-	//SelectAllTypes      *[]orgReference  `json:"select_all_types"`
+	//SelectAllTypes      *[]genericReference  `json:"select_all_types"`
 	ServiceLevel  *string          `json:"service_level"`
 	ServiceLevels *[]string        `json:"service_levels"`
 	SmartProxies  *[]orgSmartProxy `json:"smart_proxies"`
