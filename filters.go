@@ -51,7 +51,7 @@ type FilterCreate struct {
 // FilterUpdate defines model for the body of the update of a filter.
 type FilterUpdate struct {
 	Filter struct {
-		RoleID          *int    `json:"role_id"`
+		RoleID          *int    `json:"role_id,omitempty"`
 		Search          *string `json:"search,omitempty"`
 		Override        *bool   `json:"override,omitempty"`
 		PermissionIDs   *[]int  `json:"permission_ids,omitempty"`
