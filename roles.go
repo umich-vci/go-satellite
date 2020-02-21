@@ -118,8 +118,10 @@ func (s *RolesOp) GetRoleByID(ctx context.Context, roleID int) (*Role, *http.Res
 func (s *RolesOp) UpdateRole(ctx context.Context, roleID int, roleUpdate RoleUpdate) (*Role, *http.Response, error) {
 	path := rolesPath + "/" + strconv.Itoa(roleID)
 
-	if *roleUpdate.Role.Name == "" {
-		return nil, nil, NewArgError("roleUpdate.Role.Name", "cannot be an empty string")
+	if roleUpdate.Role.Name != nil {
+		if *roleUpdate.Role.Name == "" {
+			return nil, nil, NewArgError("roleUpdate.Role.Name", "cannot be an empty string")
+		}
 	}
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, roleUpdate)
