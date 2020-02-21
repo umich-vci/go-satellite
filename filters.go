@@ -6,6 +6,8 @@ import (
 	"strconv"
 )
 
+const filtersPath = basePath + "/filters"
+
 type filterPermission struct {
 	ID           *int    `json:"id"`
 	Name         *string `json:"name"`
@@ -61,6 +63,7 @@ type FilterUpdate struct {
 // Filters is an interface for interacting with
 // Red Hat Satellite role filters
 type Filters interface {
+	CreateFilter(ctx context.Context, filterCreate FilterCreate) (*Filter, *http.Response, error)
 	GetFilterByID(ctx context.Context, filterID int) (*Filter, *http.Response, error)
 }
 
@@ -70,9 +73,30 @@ type FiltersOp struct {
 	client *Client
 }
 
+// CreateFilter creates a new filter
+func (s *FiltersOp) CreateFilter(ctx context.Context, filterCreate FilterCreate) (*Filter, *http.Response, error) {
+	path := filtersPath
+
+	if filterCreate.Filter.RoleID == nil {
+		return nil, nil, NewArgError("filterCreate.RoleIDs", "cannot be empty")
+	}
+
+	req, err := s.client.NewRequest(ctx, http.MethodPost, path, filterCreate)
+	if err != nil {
+		return nil, nil, err
+	}
+	filter := new(Filter)
+	resp, err := s.client.Do(ctx, req, filter)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return filter, resp, err
+}
+
 // GetFilterByID gets a single filter by its ID
 func (s *FiltersOp) GetFilterByID(ctx context.Context, filterID int) (*Filter, *http.Response, error) {
-	path := basePath + "/filters/" + strconv.Itoa(filterID)
+	path := filtersPath + "/" + strconv.Itoa(filterID)
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
