@@ -10,7 +10,7 @@ const rolesPath = basePath + "/roles"
 
 // Role defines model for a Role.
 type Role struct {
-	Builtin       *bool                 `json:"builtin"`
+	Builtin       *int                  `json:"builtin"`
 	ClonedFromID  *int                  `json:"cloned_from_id"`
 	Description   *string               `json:"description"`
 	Filters       *[]genericIDReference `json:"filters"`
