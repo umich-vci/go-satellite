@@ -16,6 +16,7 @@ type Role struct {
 	Filters       *[]genericIDReference `json:"filters"`
 	ID            *int                  `json:"id"`
 	Locations     *[]genericReference   `json:"locations"`
+	Name          *string               `json:"name"`
 	Organizations *[]genericReference   `json:"organizations"`
 	Origin        *string               `json:"origin"`
 }
