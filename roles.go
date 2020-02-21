@@ -124,7 +124,7 @@ func (s *RolesOp) UpdateRole(ctx context.Context, roleID int, roleUpdate RoleUpd
 		}
 	}
 
-	req, err := s.client.NewRequest(ctx, http.MethodPost, path, roleUpdate)
+	req, err := s.client.NewRequest(ctx, http.MethodPut, path, roleUpdate)
 	if err != nil {
 		return nil, nil, err
 	}
