@@ -13,10 +13,12 @@ import (
 )
 
 const (
-	libraryVersion = "0.1.0"
-	defaultBaseURL = "https://satellite.example.com"
-	userAgent      = "gosatellite/" + libraryVersion
-	mediaType      = "application/json"
+	libraryVersion  = "0.1.0"
+	defaultBaseURL  = "https://satellite.example.com"
+	userAgent       = "gosatellite/" + libraryVersion
+	mediaType       = "application/json"
+	basePath        = "/api"
+	katelloBasePath = "/katello/api"
 )
 
 // Config defines the configuration needed to connect to the

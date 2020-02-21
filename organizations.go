@@ -6,8 +6,6 @@ import (
 	"strconv"
 )
 
-const katelloBasePath = "/katello/api"
-
 type orgCompRes struct {
 	ID                   *int    `json:"id"`
 	Name                 *string `json:"name"`
