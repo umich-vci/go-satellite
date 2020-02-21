@@ -91,13 +91,6 @@ type orgPtables struct {
 	UpdatedAt *string `json:"updated_at"`
 }
 
-type genericReference struct {
-	Description *string `json:"description"`
-	ID          *int    `json:"id"`
-	Name        *string `json:"name"`
-	Title       *string `json:"title"`
-}
-
 type orgShortRef struct {
 	ID   *int    `json:"id"`
 	Name *string `json:"name"`
