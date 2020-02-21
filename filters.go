@@ -64,7 +64,9 @@ type FilterUpdate struct {
 // Red Hat Satellite role filters
 type Filters interface {
 	CreateFilter(ctx context.Context, filterCreate FilterCreate) (*Filter, *http.Response, error)
+	DeleteFilter(ctx context.Context, filterID int) (*http.Response, error)
 	GetFilterByID(ctx context.Context, filterID int) (*Filter, *http.Response, error)
+	UpdateFilter(ctx context.Context, filterID int, filterUpdate FilterUpdate) (*Filter, *http.Response, error)
 }
 
 // FiltersOp handles communication with the Filter related methods of the
@@ -94,6 +96,22 @@ func (s *FiltersOp) CreateFilter(ctx context.Context, filterCreate FilterCreate)
 	return filter, resp, err
 }
 
+// DeleteFilter deletes a single filter by its ID
+func (s *FiltersOp) DeleteFilter(ctx context.Context, filterID int) (*http.Response, error) {
+	path := filtersPath + "/" + strconv.Itoa(filterID)
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(ctx, req, nil)
+	if err != nil {
+		return resp, err
+	}
+
+	return resp, err
+}
+
 // GetFilterByID gets a single filter by its ID
 func (s *FiltersOp) GetFilterByID(ctx context.Context, filterID int) (*Filter, *http.Response, error) {
 	path := filtersPath + "/" + strconv.Itoa(filterID)
@@ -102,6 +120,23 @@ func (s *FiltersOp) GetFilterByID(ctx context.Context, filterID int) (*Filter, *
 		return nil, nil, err
 	}
 
+	filter := new(Filter)
+	resp, err := s.client.Do(ctx, req, filter)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return filter, resp, err
+}
+
+// UpdateFilter updates a filter
+func (s *FiltersOp) UpdateFilter(ctx context.Context, filterID int, filterUpdate FilterUpdate) (*Filter, *http.Response, error) {
+	path := filtersPath
+
+	req, err := s.client.NewRequest(ctx, http.MethodPost, path, filterUpdate)
+	if err != nil {
+		return nil, nil, err
+	}
 	filter := new(Filter)
 	resp, err := s.client.Do(ctx, req, filter)
 	if err != nil {
