@@ -40,6 +40,8 @@ type Client struct {
 
 	Organizations Organizations
 
+	Filters Filters
+
 	Config *Config
 
 	// Optional function called after every successful request made to the DO APIs
@@ -63,6 +65,7 @@ func NewClient(config *Config) (*Client, error) {
 
 	c := &Client{client: http.DefaultClient, BaseURL: baseURL, UserAgent: userAgent, Config: config}
 	c.Organizations = &OrganizationsOp{client: c}
+	c.Filters = &FiltersOp{client: c}
 
 	return c, nil
 }
