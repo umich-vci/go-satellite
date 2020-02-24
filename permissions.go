@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 const permissionsPath = basePath + "/permissions"
@@ -20,6 +19,16 @@ type Permission struct {
 type PermissionsList struct {
 	searchResults
 	Results *[]Permission `json:"results"`
+}
+
+// PermissionsSearch defines model for searching a list of permissions.
+type PermissionsSearch struct {
+	Name         *string `json:"name,omitempty"`
+	Order        *string `json:"order,omitempty"`
+	Page         *int    `json:"page,omitempty"`
+	PerPage      *int    `json:"per_page,omitempty"`
+	ResourceType *string `json:"resource_type,omitempty"`
+	Search       *string `json:"search,omitempty"`
 }
 
 // ResourceTypes defines model for a list of resource types.
@@ -62,43 +71,10 @@ func (s *PermissionsOp) GetPermissionByID(ctx context.Context, permissionID int)
 }
 
 // ListPermissions gets all permissions or a filtered list of permissions
-func (s *PermissionsOp) ListPermissions(ctx context.Context, name *string, resourceType *string, page *int, perPage *int) (*PermissionsList, *http.Response, error) {
+func (s *PermissionsOp) ListPermissions(ctx context.Context, permSearch PermissionsSearch) (*PermissionsList, *http.Response, error) {
 	path := permissionsPath
 
-	queryStrings := []string{}
-
-	if name != nil {
-		if *name != "" {
-			queryStrings = append(queryStrings, "name="+*name)
-		}
-	}
-
-	if resourceType != nil {
-		if *resourceType != "" {
-			queryStrings = append(queryStrings, "resource_type="+*resourceType)
-		}
-	}
-
-	if page != nil {
-		if *page < 0 {
-			return nil, nil, NewArgError("page", "must be greater than 0")
-		}
-		queryStrings = append(queryStrings, "page="+strconv.Itoa(*page))
-
-	}
-
-	if perPage != nil {
-		if *perPage < 0 {
-			return nil, nil, NewArgError("perPage", "must be greater than 0")
-		}
-		queryStrings = append(queryStrings, "per_page="+strconv.Itoa(*perPage))
-	}
-
-	if len(queryStrings) > 0 {
-		path = path + "?" + strings.Join(queryStrings, "&")
-	}
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, permSearch)
 	if err != nil {
 		return nil, nil, err
 	}
