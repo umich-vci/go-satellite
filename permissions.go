@@ -75,7 +75,7 @@ func (s *PermissionsOp) ListPermissions(ctx context.Context, name *string, resou
 
 	if resourceType != nil {
 		if *resourceType != "" {
-			queryStrings = append(queryStrings, "resourceType="+*resourceType)
+			queryStrings = append(queryStrings, "resource_type="+*resourceType)
 		}
 	}
 
