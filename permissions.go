@@ -43,7 +43,7 @@ type ResourceTypes struct {
 // Red Hat Satellite permissions
 type Permissions interface {
 	GetPermissionByID(ctx context.Context, permissionID int) (*Permission, *http.Response, error)
-	ListPermissions(ctx context.Context, name *string, resourceType *string, page *int, perPage *int) (*PermissionsList, *http.Response, error)
+	ListPermissions(ctx context.Context, permSearch PermissionsSearch) (*PermissionsList, *http.Response, error)
 }
 
 // PermissionsOp handles communication with the Permissions related methods of the
