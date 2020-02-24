@@ -18,13 +18,13 @@ type Permission struct {
 
 // PermissionsList defines model for a list of permissions.
 type PermissionsList struct {
-	*searchResults
+	searchResults
 	Results *[]Permission `json:"results"`
 }
 
 // ResourceTypes defines model for a list of resource types.
 type ResourceTypes struct {
-	*searchResults
+	searchResults
 	Results *[]struct {
 		Name *string `json:"name"`
 	} `json:"results"`
