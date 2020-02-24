@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 const (
@@ -168,7 +169,7 @@ func CheckResponse(r *http.Response) error {
 	if err == nil && len(data) > 0 {
 		err := json.Unmarshal(data, errorResponse)
 		if err != nil {
-			errorResponse.Message = string(data)
+			errorResponse.ErrorStruct.FullMessages = &[]string{string(data)}
 		}
 	}
 
@@ -177,7 +178,7 @@ func CheckResponse(r *http.Response) error {
 
 func (r *ErrorResponse) Error() string {
 	return fmt.Sprintf("%v %v: %d %v",
-		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, r.Message)
+		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, strings.Join(*r.ErrorStruct.FullMessages, "|"))
 }
 
 // An ErrorResponse reports the error caused by an API request
@@ -186,5 +187,7 @@ type ErrorResponse struct {
 	Response *http.Response
 
 	// Error message
-	Message string `json:"message"`
+	ErrorStruct struct {
+		FullMessages *[]string `json:"full_messages"`
+	} `json:"error"`
 }
