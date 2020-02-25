@@ -24,3 +24,9 @@ type searchResults struct {
 	Subtotal *int    `json:"subtotal"`
 	Total    *int    `json:"total"`
 }
+
+type shortOrg struct {
+	ID    *int    `json:"id"`
+	Label *string `json:"label"`
+	Name  *string `json:"name"`
+}
