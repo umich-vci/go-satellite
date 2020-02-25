@@ -180,14 +180,17 @@ func CheckResponse(r *http.Response) error {
 }
 
 func (r *ErrorResponse) Error() string {
-	fullMessages := []string{}
+	allMessages := []string{}
 	if r.ErrorStruct != nil {
 		if r.ErrorStruct.FullMessages != nil {
-			fullMessages = *r.ErrorStruct.FullMessages
+			allMessages = append(allMessages, *r.ErrorStruct.FullMessages...)
+		}
+		if r.ErrorStruct.Message != nil {
+			allMessages = append(allMessages, *r.ErrorStruct.Message)
 		}
 	}
 	return fmt.Sprintf("%v %v: %d %v",
-		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, strings.Join(fullMessages, "|"))
+		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, strings.Join(allMessages, "|"))
 }
 
 // An ErrorResponse reports the error caused by an API request
@@ -198,5 +201,6 @@ type ErrorResponse struct {
 	// Error message
 	ErrorStruct *struct {
 		FullMessages *[]string `json:"full_messages"`
+		Message      *string   `json:"message"`
 	} `json:"error"`
 }
