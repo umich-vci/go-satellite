@@ -67,14 +67,14 @@ func (s *ManifestsOp) DeleteManifest(ctx context.Context, orgID int) (*http.Resp
 }
 
 // GetManifestHistory gets the manifest history for an organization based on its ID
-func (s *ManifestsOp) GetManifestHistory(ctx context.Context, orgID int) (*ManifestHistory, *http.Response, error) {
+func (s *ManifestsOp) GetManifestHistory(ctx context.Context, orgID int) (*[]ManifestHistoryItem, *http.Response, error) {
 	path := organizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/manifest_history"
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	hist := new(ManifestHistory)
+	hist := new([]ManifestHistoryItem)
 	resp, err := s.client.Do(ctx, req, hist)
 	if err != nil {
 		return nil, resp, err
