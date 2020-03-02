@@ -27,7 +27,7 @@ type PermissionsSearch struct {
 	Order        *string `json:"order,omitempty"`
 	Page         *int    `json:"page,omitempty"`
 	PerPage      *int    `json:"per_page,omitempty"`
-	ResourceType *string `json:"resource_type,omitempty"`
+	ResourceType *string `json:"resource_type"`
 	Search       *string `json:"search,omitempty"`
 }
 
