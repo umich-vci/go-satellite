@@ -22,13 +22,26 @@ type ManifestHistory struct {
 	History *[]ManifestHistoryItem
 }
 
+// ManifestUpload defines model for the response from a manifest upload to an organization
+type ManifestUpload struct {
+	ID        *string `json:"id"`
+	Label     *string `json:"label"`
+	Pending   *bool   `json:"pending"`
+	Action    *string `json:"action"`
+	UserName  *string `json:"username"`
+	StartedAt *string `json:"started_at"`
+	EndedAt   *string `json:"ended_at"`
+	State     *string `json:"state"`
+	Result    *string `json:"result"`
+}
+
 // Manifests is an interface for interacting with
 // Red Hat Satellite Subscription Manifests
 type Manifests interface {
 	DeleteManifest(ctx context.Context, orgID int) (*http.Response, error)
 	GetManifestHistory(ctx context.Context, orgID int) (*ManifestHistory, *http.Response, error)
 	RefreshManifest(ctx context.Context, orgID int) (*http.Response, error)
-	UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte) (*ManifestHistory, *http.Response, error)
+	UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte) (*ManifestUpload, *http.Response, error)
 }
 
 // ManifestsOp handles communication with the Manifest related methods of the
@@ -88,7 +101,7 @@ func (s *ManifestsOp) RefreshManifest(ctx context.Context, orgID int) (*http.Res
 }
 
 // UploadManifest uploads a manifest to an organization
-func (s *ManifestsOp) UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte) (*ManifestHistory, *http.Response, error) {
+func (s *ManifestsOp) UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte) (*ManifestUpload, *http.Response, error) {
 	path := organizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/upload"
 
 	var body map[string]io.Reader
@@ -103,11 +116,11 @@ func (s *ManifestsOp) UploadManifest(ctx context.Context, orgID int, repoURL *st
 		return nil, nil, err
 	}
 
-	hist := new(ManifestHistory)
-	resp, err := s.client.Do(ctx, req, hist)
+	status := new(ManifestUpload)
+	resp, err := s.client.Do(ctx, req, status)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return hist, resp, err
+	return status, resp, err
 }
