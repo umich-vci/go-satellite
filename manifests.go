@@ -17,11 +17,6 @@ type ManifestHistoryItem struct {
 	StatusMessage *string `json:"statusMessage"`
 }
 
-// ManifestHistory defines model for the manifest history of an organization
-type ManifestHistory struct {
-	History *[]ManifestHistoryItem
-}
-
 // ManifestUpload defines model for the response from a manifest upload to an organization
 type ManifestUpload struct {
 	ID        *string `json:"id"`
@@ -39,7 +34,7 @@ type ManifestUpload struct {
 // Red Hat Satellite Subscription Manifests
 type Manifests interface {
 	DeleteManifest(ctx context.Context, orgID int) (*http.Response, error)
-	GetManifestHistory(ctx context.Context, orgID int) (*ManifestHistory, *http.Response, error)
+	GetManifestHistory(ctx context.Context, orgID int) (*[]ManifestHistoryItem, *http.Response, error)
 	RefreshManifest(ctx context.Context, orgID int) (*http.Response, error)
 	UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte) (*ManifestUpload, *http.Response, error)
 }
