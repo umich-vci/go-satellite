@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strings"
@@ -40,6 +41,8 @@ type Client struct {
 	UserAgent string
 
 	Filters Filters
+
+	Manifests Manifests
 
 	Organizations Organizations
 
@@ -74,6 +77,7 @@ func NewClient(config *Config) (*Client, error) {
 
 	c := &Client{client: http.DefaultClient, BaseURL: baseURL, UserAgent: userAgent, Config: config}
 	c.Filters = &FiltersOp{client: c}
+	c.Manifests = &ManifestsOp{client: c}
 	c.Organizations = &OrganizationsOp{client: c}
 	c.Permissions = &PermissionsOp{client: c}
 	c.Products = &ProductsOp{client: c}
@@ -110,6 +114,50 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 	req.SetBasicAuth(c.Config.Username, c.Config.Password)
 
 	req.Header.Add("Content-Type", mediaType)
+	req.Header.Add("Accept", mediaType)
+	req.Header.Add("User-Agent", c.UserAgent)
+
+	return req, nil
+}
+
+// NewMultipartFormRequest creates an API request. A relative URL can be provided in urlStr, which will be resolved to the
+// BaseURL of the Client. Relative URLS should always be specified without a preceding slash. The content in form is
+// added to the request as form data
+func (c *Client) NewMultipartFormRequest(ctx context.Context, method, urlStr string, form map[string]io.Reader) (*http.Request, error) {
+	rel, err := url.Parse(urlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	u := c.BaseURL.ResolveReference(rel)
+
+	var buf bytes.Buffer
+	w := multipart.NewWriter(&buf)
+	for key, r := range form {
+		var fw io.Writer
+		if x, ok := r.(io.Closer); ok {
+			defer x.Close()
+		}
+
+		if fw, err = w.CreateFormField(key); err != nil {
+			return nil, err
+		}
+
+		if _, err = io.Copy(fw, r); err != nil {
+			return nil, err
+		}
+	}
+	w.Close()
+
+	req, err := http.NewRequest(method, u.String(), &buf)
+	if err != nil {
+		return nil, err
+	}
+
+	req.SetBasicAuth(c.Config.Username, c.Config.Password)
+
+	req.Header.Add("Content-Type", w.FormDataContentType())
+	req.Header.Add("Multipart", "true")
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.UserAgent)
 
