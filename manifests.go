@@ -104,7 +104,7 @@ func (s *ManifestsOp) RefreshManifest(ctx context.Context, orgID int) (*http.Res
 func (s *ManifestsOp) UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte) (*ManifestUpload, *http.Response, error) {
 	path := organizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/upload"
 
-	var body map[string]io.Reader
+	body := make(map[string]io.Reader)
 	if repoURL != nil {
 		body["repository_url"] = strings.NewReader(*repoURL)
 	}
