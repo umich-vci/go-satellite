@@ -1,12 +1,9 @@
 package gosatellite
 
 import (
-	"bytes"
 	"context"
-	"io"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 // ManifestHistoryItem defines model for a single manifest history
@@ -36,7 +33,7 @@ type Manifests interface {
 	DeleteManifest(ctx context.Context, orgID int) (*http.Response, error)
 	GetManifestHistory(ctx context.Context, orgID int) (*[]ManifestHistoryItem, *http.Response, error)
 	RefreshManifest(ctx context.Context, orgID int) (*http.Response, error)
-	UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte) (*ManifestUpload, *http.Response, error)
+	UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte, manifestFilename string) (*ManifestUpload, *http.Response, error)
 }
 
 // ManifestsOp handles communication with the Manifest related methods of the
@@ -96,17 +93,10 @@ func (s *ManifestsOp) RefreshManifest(ctx context.Context, orgID int) (*http.Res
 }
 
 // UploadManifest uploads a manifest to an organization
-func (s *ManifestsOp) UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte) (*ManifestUpload, *http.Response, error) {
+func (s *ManifestsOp) UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte, manifestFilename string) (*ManifestUpload, *http.Response, error) {
 	path := organizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/upload"
 
-	body := make(map[string]io.Reader)
-	if repoURL != nil {
-		body["repository_url"] = strings.NewReader(*repoURL)
-	}
-
-	body["content"] = bytes.NewReader(manifest)
-
-	req, err := s.client.NewMultipartFormRequest(ctx, http.MethodPost, path, body)
+	req, err := s.client.NewManifestUploadRequest(ctx, http.MethodPost, path, manifest, manifestFilename)
 	if err != nil {
 		return nil, nil, err
 	}

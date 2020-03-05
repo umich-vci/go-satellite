@@ -120,10 +120,10 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 	return req, nil
 }
 
-// NewMultipartFormRequest creates an API request. A relative URL can be provided in urlStr, which will be resolved to the
+// NewManifestUploadRequest creates an API request. A relative URL can be provided in urlStr, which will be resolved to the
 // BaseURL of the Client. Relative URLS should always be specified without a preceding slash. The content in form is
 // added to the request as form data
-func (c *Client) NewMultipartFormRequest(ctx context.Context, method, urlStr string, form map[string]io.Reader) (*http.Request, error) {
+func (c *Client) NewManifestUploadRequest(ctx context.Context, method, urlStr string, manifest []byte, manifestFilename string) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
@@ -133,19 +133,12 @@ func (c *Client) NewMultipartFormRequest(ctx context.Context, method, urlStr str
 
 	var buf bytes.Buffer
 	w := multipart.NewWriter(&buf)
-	for key, r := range form {
-		var fw io.Writer
-		if x, ok := r.(io.Closer); ok {
-			defer x.Close()
-		}
-
-		if fw, err = w.CreateFormField(key); err != nil {
-			return nil, err
-		}
-
-		if _, err = io.Copy(fw, r); err != nil {
-			return nil, err
-		}
+	var fw io.Writer
+	if fw, err = w.CreateFormFile("content", manifestFilename); err != nil {
+		return nil, err
+	}
+	if _, err = fw.Write(manifest); err != nil {
+		return nil, err
 	}
 	w.Close()
 
