@@ -3,6 +3,7 @@ package gosatellite
 import (
 	"context"
 	"net/http"
+	"strconv"
 )
 
 const productsPath = katelloBasePath + "/products"
@@ -77,6 +78,7 @@ type ProductSearch struct {
 // Red Hat Satellite products
 type Products interface {
 	ListProductsByOrgID(ctx context.Context, orgID int, prodSearch ProductSearch) (*ProductsList, *http.Response, error)
+	ListProducts(ctx context.Context, prodSearch ProductSearch) (*ProductsList, *http.Response, error)
 }
 
 // ProductsOp handles communication with the Product related methods of the
@@ -87,9 +89,25 @@ type ProductsOp struct {
 
 // ListProductsByOrgID gets all products or a filtered list of products for a specific organization
 func (s *ProductsOp) ListProductsByOrgID(ctx context.Context, orgID int, prodSearch ProductSearch) (*ProductsList, *http.Response, error) {
-	path := productsPath
+	path := organizationsPath + strconv.Itoa(orgID) + "/products"
 
-	prodSearch.OrganizationID = &orgID
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, prodSearch)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	products := new(ProductsList)
+	resp, err := s.client.Do(ctx, req, products)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return products, resp, err
+}
+
+// ListProducts gets all products or a filtered list of products
+func (s *ProductsOp) ListProducts(ctx context.Context, prodSearch ProductSearch) (*ProductsList, *http.Response, error) {
+	path := productsPath
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, prodSearch)
 	if err != nil {
