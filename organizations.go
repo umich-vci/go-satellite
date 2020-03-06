@@ -8,13 +8,6 @@ import (
 
 const organizationsPath = katelloBasePath + "/organizations"
 
-type orgCompRes struct {
-	ID                   *int    `json:"id"`
-	Name                 *string `json:"name"`
-	Provider             *string `json:"provider"`
-	ProviderFriendlyName *string `json:"provider_friendly_name"`
-}
-
 type orgOwnerDetails struct {
 	AutobindDisabled      *bool                     `json:"autobindDisabled"`
 	ContentAccessMode     *string                   `json:"contentAccessMode"`
@@ -83,80 +76,41 @@ type orgParameter struct {
 	Value         *string `json:"value"`
 }
 
-type orgPtables struct {
-	CreatedAt *string `json:"created_at"`
-	ID        *int    `json:"id"`
-	Name      *string `json:"name"`
-	OsFamily  *string `json:"os_family"`
-	UpdatedAt *string `json:"updated_at"`
-}
-
-type orgShortRef struct {
-	ID   *int    `json:"id"`
-	Name *string `json:"name"`
-}
-
-type orgSmartProxy struct {
-	ID   *int    `json:"id"`
-	Name *string `json:"name"`
-	URL  *string `json:"url"`
-}
-
-type orgSubnet struct {
-	Description    *string `json:"description"`
-	ID             *int    `json:"id"`
-	Name           *string `json:"name"`
-	NetworkAddress *string `json:"network_address"`
-}
-
-type orgTemplate struct {
-	ID               *int    `json:"id"`
-	Name             *string `json:"name"`
-	TemplateKindID   *int    `json:"template_kind_id"`
-	TemplateKindName *string `json:"template_kind_name"`
-}
-
-type orgUser struct {
-	Description *string `json:"description"`
-	ID          *int    `json:"id"`
-	Login       *string `json:"login"`
-}
-
 // Organization defines model for an Organization.
 type Organization struct {
 	Ancestry              *string             `json:"ancestry"`
-	ComputeResources      *[]orgCompRes       `json:"compute_resources"`
-	ConfigTemplates       *[]orgTemplate      `json:"config_templates"`
+	ComputeResources      *[]genericCompRes   `json:"compute_resources"`
+	ConfigTemplates       *[]genericTemplate  `json:"config_templates"`
 	CreatedAt             *string             `json:"created_at"`
 	DefaultContentViewID  *int                `json:"default_content_view_id"`
 	Description           *string             `json:"description"`
-	Domains               *[]orgShortRef      `json:"domains"`
-	Environments          *[]orgShortRef      `json:"environments"`
+	Domains               *[]genericShortRef  `json:"domains"`
+	Environments          *[]genericShortRef  `json:"environments"`
 	HostGroups            *[]genericReference `json:"hostgroups"`
 	HostsCount            *int                `json:"hosts_count"`
 	ID                    *int                `json:"id"`
 	Label                 *string             `json:"label"`
 	LibraryID             *int                `json:"library_id"`
 	Locations             *[]genericReference `json:"locations"`
-	Media                 *[]orgShortRef      `json:"media"`
+	Media                 *[]genericShortRef  `json:"media"`
 	Name                  *string             `json:"name"`
 	OwnerDetails          *orgOwnerDetails    `json:"owner_details"`
 	Parameters            *[]orgParameter     `json:"parameters"`
 	ParentID              *int                `json:"parent_id"`
 	ParentName            *string             `json:"parent_name"`
-	ProvisioningTemplates *[]orgTemplate      `json:"provisioning_templates"`
-	Ptables               *[]orgPtables       `json:"ptables"`
+	ProvisioningTemplates *[]genericTemplate  `json:"provisioning_templates"`
+	Ptables               *[]genericPtables   `json:"ptables"`
 	//Realms                *[]genericReference  `json:"realms"`
-	RedHatRepositoryURL *string `json:"redhat_repository_url"`
-	//SelectAllTypes      *[]genericReference  `json:"select_all_types"`
-	ServiceLevel  *string          `json:"service_level"`
-	ServiceLevels *[]string        `json:"service_levels"`
-	SmartProxies  *[]orgSmartProxy `json:"smart_proxies"`
-	Subnets       *[]orgSubnet     `json:"subnets,omitempty"`
+	RedHatRepositoryURL *string              `json:"redhat_repository_url"`
+	SelectAllTypes      *[]string            `json:"select_all_types"`
+	ServiceLevel        *string              `json:"service_level"`
+	ServiceLevels       *[]string            `json:"service_levels"`
+	SmartProxies        *[]genericSmartProxy `json:"smart_proxies"`
+	Subnets             *[]genericSubnet     `json:"subnets,omitempty"`
 	//SystemPurposes
-	Title     *string    `json:"title"`
-	UpdatedAt *string    `json:"updated_at"`
-	Users     *[]orgUser `json:"users"`
+	Title     *string        `json:"title"`
+	UpdatedAt *string        `json:"updated_at"`
+	Users     *[]genericUser `json:"users"`
 }
 
 // OrganizationCreate defines model for OrganizationCreate.

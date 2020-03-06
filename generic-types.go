@@ -30,3 +30,49 @@ type shortOrg struct {
 	Label *string `json:"label"`
 	Name  *string `json:"name"`
 }
+
+type genericCompRes struct {
+	ID                   *int    `json:"id"`
+	Name                 *string `json:"name"`
+	Provider             *string `json:"provider"`
+	ProviderFriendlyName *string `json:"provider_friendly_name"`
+}
+
+type genericTemplate struct {
+	ID               *int    `json:"id"`
+	Name             *string `json:"name"`
+	TemplateKindID   *int    `json:"template_kind_id"`
+	TemplateKindName *string `json:"template_kind_name"`
+}
+
+type genericShortRef struct {
+	ID   *int    `json:"id"`
+	Name *string `json:"name"`
+}
+
+type genericPtables struct {
+	CreatedAt *string `json:"created_at"`
+	ID        *int    `json:"id"`
+	Name      *string `json:"name"`
+	OsFamily  *string `json:"os_family"`
+	UpdatedAt *string `json:"updated_at"`
+}
+
+type genericSmartProxy struct {
+	ID   *int    `json:"id"`
+	Name *string `json:"name"`
+	URL  *string `json:"url"`
+}
+
+type genericSubnet struct {
+	Description    *string `json:"description"`
+	ID             *int    `json:"id"`
+	Name           *string `json:"name"`
+	NetworkAddress *string `json:"network_address"`
+}
+
+type genericUser struct {
+	Description *string `json:"description"`
+	ID          *int    `json:"id"`
+	Login       *string `json:"login"`
+}

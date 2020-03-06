@@ -42,6 +42,8 @@ type Client struct {
 
 	Filters Filters
 
+	Locations Locations
+
 	Manifests Manifests
 
 	Organizations Organizations
@@ -77,6 +79,7 @@ func NewClient(config *Config) (*Client, error) {
 
 	c := &Client{client: http.DefaultClient, BaseURL: baseURL, UserAgent: userAgent, Config: config}
 	c.Filters = &FiltersOp{client: c}
+	c.Locations = &LocationsOp{client: c}
 	c.Manifests = &ManifestsOp{client: c}
 	c.Organizations = &OrganizationsOp{client: c}
 	c.Permissions = &PermissionsOp{client: c}
