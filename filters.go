@@ -133,7 +133,7 @@ func (s *FiltersOp) GetFilterByID(ctx context.Context, filterID int) (*Filter, *
 func (s *FiltersOp) UpdateFilter(ctx context.Context, filterID int, filterUpdate FilterUpdate) (*Filter, *http.Response, error) {
 	path := filtersPath
 
-	req, err := s.client.NewRequest(ctx, http.MethodPost, path, filterUpdate)
+	req, err := s.client.NewRequest(ctx, http.MethodPut, path, filterUpdate)
 	if err != nil {
 		return nil, nil, err
 	}
