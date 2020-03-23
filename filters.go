@@ -131,7 +131,7 @@ func (s *FiltersOp) GetFilterByID(ctx context.Context, filterID int) (*Filter, *
 
 // UpdateFilter updates a filter
 func (s *FiltersOp) UpdateFilter(ctx context.Context, filterID int, filterUpdate FilterUpdate) (*Filter, *http.Response, error) {
-	path := filtersPath
+	path := filtersPath + "/" + strconv.Itoa(filterID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, filterUpdate)
 	if err != nil {
