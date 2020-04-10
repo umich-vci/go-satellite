@@ -57,7 +57,7 @@ type HostCollectionsOp struct {
 type HostCollections interface {
 	CreateHostCollection(ctx context.Context, orgID int, hcCreate HostCollectionCreate) (*HostCollection, *http.Response, error)
 	DeleteHostCollection(ctx context.Context, hcID int) (*http.Response, error)
-	GetHostCollection(ctx context.Context, hcID int) (*HostCollection, *http.Response, error)
+	GetHostCollectionByID(ctx context.Context, hcID int) (*HostCollection, *http.Response, error)
 	UpdateHostCollection(ctx context.Context, hcID int, hcUpdate HostCollectionCreate) (*HostCollection, *http.Response, error)
 }
 
@@ -101,8 +101,8 @@ func (s *HostCollectionsOp) DeleteHostCollection(ctx context.Context, hcID int) 
 	return resp, err
 }
 
-// GetHostCollection gets a host collection
-func (s *HostCollectionsOp) GetHostCollection(ctx context.Context, hcID int) (*HostCollection, *http.Response, error) {
+// GetHostCollectionByID gets a host collection by it's ID
+func (s *HostCollectionsOp) GetHostCollectionByID(ctx context.Context, hcID int) (*HostCollection, *http.Response, error) {
 	path := hostCollectionsPath + "/" + strconv.Itoa(hcID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
