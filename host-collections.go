@@ -25,7 +25,7 @@ type HostCollection struct {
 
 // HostCollectionCreate defines model for creating a host collection.
 type HostCollectionCreate struct {
-	Name           *string `json:"name"`
+	Name           string  `json:"name"`
 	Description    *string `json:"description,omitempty"`
 	HostIDs        *[]int  `json:"host_ids,omitempty"`
 	MaxHosts       *int    `json:"max_hosts,omitempty"`
@@ -65,9 +65,7 @@ type HostCollections interface {
 func (s *HostCollectionsOp) CreateHostCollection(ctx context.Context, orgID int, hcCreate HostCollectionCreate) (*HostCollection, *http.Response, error) {
 	path := organizationsPath + "/host_collections"
 
-	if hcCreate.Name == nil {
-		return nil, nil, NewArgError("hcCreate.Name", "cannot be empty")
-	} else if *hcCreate.Name == "" {
+	if hcCreate.Name == "" {
 		return nil, nil, NewArgError("hcCreate.Name", "cannot be empty")
 	}
 
