@@ -22,7 +22,7 @@ type ActivationKey struct {
 	ID               *int                  `json:"id"`
 	MaxHosts         *int                  `json:"max_hosts"`
 	Name             *string               `json:"name"`
-	Organization     *[]shortOrg           `json:"organization"`
+	Organization     *shortOrg             `json:"organization"`
 	OrganizationID   *int                  `json:"organization_id"`
 	Permissions      *akPermissions        `json:"permissions"`
 	Products         *[]genericShortRef    `json:"products"`
