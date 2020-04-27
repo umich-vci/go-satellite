@@ -112,6 +112,10 @@ type ActivationKeysOp struct {
 // ActivationKeys is an interface for interacting with
 // Red Hat Satellite Activation Keys
 type ActivationKeys interface {
+	CreateActivationKey(ctx context.Context, akCreate ActivationKeyCreate) (*ActivationKey, *http.Response, error)
+	DeleteActivationKey(ctx context.Context, akID int) (*http.Response, error)
+	GetActivationKeyByID(ctx context.Context, akID int) (*ActivationKey, *http.Response, error)
+	UpdateActivationKey(ctx context.Context, akUpdate ActivationKeyUpdate) (*ActivationKey, *http.Response, error)
 }
 
 // AttachSubscriptionToActivationKey attaches a subscription to an activation key
@@ -246,6 +250,22 @@ func (s *ActivationKeysOp) CreateActivationKey(ctx context.Context, akCreate Act
 	}
 
 	return activationKey, resp, nil
+}
+
+// DeleteActivationKey deletes an activation key by its ID
+func (s *ActivationKeysOp) DeleteActivationKey(ctx context.Context, akID int) (*http.Response, error) {
+	path := activationKeyPath + "/" + strconv.Itoa(akID)
+
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(ctx, req, nil)
+	if err != nil {
+		return resp, err
+	}
+
+	return resp, err
 }
 
 // GetActivationKeyByID gets a single activation key by its ID
