@@ -40,6 +40,8 @@ type Client struct {
 
 	UserAgent string
 
+	ActivationKeys ActivationKeys
+
 	Filters Filters
 
 	HostCollections HostCollections
@@ -80,6 +82,7 @@ func NewClient(config *Config) (*Client, error) {
 	}
 
 	c := &Client{client: http.DefaultClient, BaseURL: baseURL, UserAgent: userAgent, Config: config}
+	c.ActivationKeys = &ActivationKeysOp{client: c}
 	c.Filters = &FiltersOp{client: c}
 	c.HostCollections = &HostCollectionsOp{client: c}
 	c.Locations = &LocationsOp{client: c}
