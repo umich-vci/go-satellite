@@ -112,8 +112,10 @@ type ActivationKeysOp struct {
 // ActivationKeys is an interface for interacting with
 // Red Hat Satellite Activation Keys
 type ActivationKeys interface {
+	AssociateHostCollectionsWithActivationKey(ctx context.Context, akID int, hostCollections []int) (*ActivationKey, *http.Response, error)
 	CreateActivationKey(ctx context.Context, akCreate ActivationKeyCreate) (*ActivationKey, *http.Response, error)
 	DeleteActivationKey(ctx context.Context, akID int) (*http.Response, error)
+	DisassociateHostCollectionsWithActivationKey(ctx context.Context, akID int, hostCollections []int) (*ActivationKey, *http.Response, error)
 	GetActivationKeyByID(ctx context.Context, akID int) (*ActivationKey, *http.Response, error)
 	UpdateActivationKey(ctx context.Context, akID int, akUpdate ActivationKeyUpdate) (*ActivationKey, *http.Response, error)
 }
