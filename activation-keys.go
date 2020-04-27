@@ -115,7 +115,7 @@ type ActivationKeys interface {
 	CreateActivationKey(ctx context.Context, akCreate ActivationKeyCreate) (*ActivationKey, *http.Response, error)
 	DeleteActivationKey(ctx context.Context, akID int) (*http.Response, error)
 	GetActivationKeyByID(ctx context.Context, akID int) (*ActivationKey, *http.Response, error)
-	UpdateActivationKey(ctx context.Context, akUpdate ActivationKeyUpdate) (*ActivationKey, *http.Response, error)
+	UpdateActivationKey(ctx context.Context, akID int, akUpdate ActivationKeyUpdate) (*ActivationKey, *http.Response, error)
 }
 
 // AttachSubscriptionToActivationKey attaches a subscription to an activation key
@@ -327,10 +327,10 @@ func (s *ActivationKeysOp) ListActivationKeys(ctx context.Context, akSearch Acti
 }
 
 // UpdateActivationKey updates an activation key
-func (s *ActivationKeysOp) UpdateActivationKey(ctx context.Context, akUpdate ActivationKeyUpdate) (*ActivationKey, *http.Response, error) {
-	path := activationKeyPath
+func (s *ActivationKeysOp) UpdateActivationKey(ctx context.Context, akID int, akUpdate ActivationKeyUpdate) (*ActivationKey, *http.Response, error) {
+	path := activationKeyPath + "/" + strconv.Itoa(akID)
 
-	req, err := s.client.NewRequest(ctx, http.MethodPost, path, akUpdate)
+	req, err := s.client.NewRequest(ctx, http.MethodPut, path, akUpdate)
 	if err != nil {
 		return nil, nil, err
 	}
