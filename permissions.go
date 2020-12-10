@@ -23,12 +23,10 @@ type PermissionsList struct {
 
 // PermissionsSearch defines model for searching a list of permissions.
 type PermissionsSearch struct {
-	Name         *string `json:"name,omitempty"`
-	Order        *string `json:"order,omitempty"`
-	Page         *int    `json:"page,omitempty"`
-	PerPage      *int    `json:"per_page,omitempty"`
-	ResourceType *string `json:"resource_type,omitempty"`
-	Search       *string `json:"search,omitempty"`
+	Order   *string `json:"order,omitempty"`
+	Page    *int    `json:"page,omitempty"`
+	PerPage *int    `json:"per_page,omitempty"`
+	Search  *string `json:"search,omitempty"`
 }
 
 // ResourceTypes defines model for a list of resource types.
