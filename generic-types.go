@@ -76,3 +76,17 @@ type genericUser struct {
 	ID          *int    `json:"id"`
 	Login       *string `json:"login"`
 }
+
+type genericRole struct {
+	Name        *string `json:"name"`
+	ID          *int    `json:"id"`
+	Description *string `json:"description"`
+	Origin      *string `json:"origin"`
+}
+
+type genericUserGroup struct {
+	Name      *string `json:"name"`
+	ID        *int    `json:"id"`
+	CreatedAt *string `json:"created_at"`
+	UpdatedAt *string `json:"updated_at"`
+}

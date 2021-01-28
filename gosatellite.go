@@ -60,6 +60,8 @@ type Client struct {
 
 	Roles Roles
 
+	UserGroups UserGroups
+
 	Config *Config
 
 	// Optional function called after every successful request made to the DO APIs
@@ -92,6 +94,7 @@ func NewClient(config *Config) (*Client, error) {
 	c.Products = &ProductsOp{client: c}
 	c.Repositories = &RepositoriesOp{client: c}
 	c.Roles = &RolesOp{client: c}
+	c.UserGroups = &UserGroupsOp{client: c}
 
 	return c, nil
 }
