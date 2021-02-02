@@ -44,7 +44,7 @@ type ManifestsOp struct {
 
 // DeleteManifest deletes a manifest for an organization by its ID
 func (s *ManifestsOp) DeleteManifest(ctx context.Context, orgID int) (*http.Response, error) {
-	path := organizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/delete_manifest"
+	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/delete_manifest"
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
 	if err != nil {
@@ -60,7 +60,7 @@ func (s *ManifestsOp) DeleteManifest(ctx context.Context, orgID int) (*http.Resp
 
 // GetManifestHistory gets the manifest history for an organization based on its ID
 func (s *ManifestsOp) GetManifestHistory(ctx context.Context, orgID int) (*[]ManifestHistoryItem, *http.Response, error) {
-	path := organizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/manifest_history"
+	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/manifest_history"
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -77,7 +77,7 @@ func (s *ManifestsOp) GetManifestHistory(ctx context.Context, orgID int) (*[]Man
 
 // RefreshManifest refreshes the manifest attached to an organization
 func (s *ManifestsOp) RefreshManifest(ctx context.Context, orgID int) (*http.Response, error) {
-	path := organizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/refresh_manifest"
+	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/refresh_manifest"
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, nil)
 	if err != nil {
@@ -94,7 +94,7 @@ func (s *ManifestsOp) RefreshManifest(ctx context.Context, orgID int) (*http.Res
 
 // UploadManifest uploads a manifest to an organization
 func (s *ManifestsOp) UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte, manifestFilename string) (*ManifestUpload, *http.Response, error) {
-	path := organizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/upload"
+	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/upload"
 
 	req, err := s.client.NewManifestUploadRequest(ctx, http.MethodPost, path, manifest, manifestFilename)
 	if err != nil {

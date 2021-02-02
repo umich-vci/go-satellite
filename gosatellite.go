@@ -11,7 +11,10 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strings"
+
+	"github.com/google/go-querystring/query"
 )
 
 const (
@@ -24,7 +27,7 @@ const (
 )
 
 // Config defines the configuration needed to connect to the
-// IBM Spectrum Protect Operations Center server
+// Red Hat Satellite server
 type Config struct {
 	Username      string
 	Password      string
@@ -32,46 +35,106 @@ type Config struct {
 	SSLVerify     bool
 }
 
-// Client is the API client for IBM Spectrum Protect Operations Center
+// Client is the API client for Red Hat Satellite
 type Client struct {
+	// HTTP client used to communicate with the Red Hat Satellite API.
 	client *http.Client
 
-	BaseURL *url.URL
-
-	UserAgent string
-
-	ActivationKeys ActivationKeys
-
-	Filters Filters
-
-	HostCollections HostCollections
-
-	Locations Locations
-
-	Manifests Manifests
-
-	Organizations Organizations
-
-	Permissions Permissions
-
-	Products Products
-
-	Repositories Repositories
-
-	Roles Roles
-
-	UserGroups UserGroups
-
+	// Config for the client such as the satellite hostname and credentials
 	Config *Config
 
-	// Optional function called after every successful request made to the DO APIs
+	// Base URL for API requests.
+	BaseURL *url.URL
+
+	// User agent for client
+	UserAgent string
+
+	// Services used for communicating with the API
+	ActivationKeys  ActivationKeys
+	AuthSourceLDAPs AuthSourceLDAPs
+	Filters         Filters
+	HostCollections HostCollections
+	Locations       Locations
+	Manifests       Manifests
+	Organizations   Organizations
+	Permissions     Permissions
+	Products        Products
+	Repositories    Repositories
+	Roles           Roles
+	UserGroups      UserGroups
+
+	// Optional function called after every successful request made to the Red Hat Satellite APIs
 	onRequestCompleted RequestCompletionCallback
+
+	// Optional extra HTTP headers to set on every request to the API.
+	headers map[string]string
 }
 
 // RequestCompletionCallback defines the type of the request callback function
 type RequestCompletionCallback func(*http.Request, *http.Response)
 
-// NewClient returns a new IBM Spectrum Protect Operations Center REST API client
+// ListOptions specifies the optional parameters to various List methods that
+// support pagination.
+type ListOptions struct {
+	// Scope by locations
+	LocationID int `url:"location_id,omitempty"`
+
+	// Sort field and order, eg. ‘id DESC’
+	Order string `url:"order,omitempty"`
+
+	// Scope by organizations
+	OrganizationID int `url:"organization_id,omitempty"`
+
+	// For paginated result sets, page of results to retrieve.
+	Page int `url:"page,omitempty"`
+
+	// For paginated result sets, the number of results to include per page.
+	PerPage int `url:"per_page,omitempty"`
+
+	// A search string used to filter results
+	Search string `url:"search,omitempty"`
+}
+
+// An ErrorResponse reports the error caused by an API request
+type ErrorResponse struct {
+	// HTTP response that caused this error
+	Response *http.Response
+
+	// Error message
+	ErrorStruct *struct {
+		FullMessages *[]string `json:"full_messages"`
+		Message      *string   `json:"message"`
+	} `json:"error"`
+}
+
+func addOptions(s string, opt interface{}) (string, error) {
+	v := reflect.ValueOf(opt)
+
+	if v.Kind() == reflect.Ptr && v.IsNil() {
+		return s, nil
+	}
+
+	origURL, err := url.Parse(s)
+	if err != nil {
+		return s, err
+	}
+
+	origValues := origURL.Query()
+
+	newValues, err := query.Values(opt)
+	if err != nil {
+		return s, err
+	}
+
+	for k, v := range newValues {
+		origValues[k] = v
+	}
+
+	origURL.RawQuery = origValues.Encode()
+	return origURL.String(), nil
+}
+
+// NewClient returns a new Red Hat Satellite REST API client
 func NewClient(config *Config) (*Client, error) {
 	defaultBaseURL := "https://" + config.SatelliteHost
 	baseURL, err := url.Parse(defaultBaseURL)
@@ -85,6 +148,7 @@ func NewClient(config *Config) (*Client, error) {
 
 	c := &Client{client: http.DefaultClient, BaseURL: baseURL, UserAgent: userAgent, Config: config}
 	c.ActivationKeys = &ActivationKeysOp{client: c}
+	c.AuthSourceLDAPs = &AuthSourceLDAPsOp{client: c}
 	c.Filters = &FiltersOp{client: c}
 	c.HostCollections = &HostCollectionsOp{client: c}
 	c.Locations = &LocationsOp{client: c}
@@ -96,6 +160,8 @@ func NewClient(config *Config) (*Client, error) {
 	c.Roles = &RolesOp{client: c}
 	c.UserGroups = &UserGroupsOp{client: c}
 
+	c.headers = make(map[string]string)
+
 	return c, nil
 }
 
@@ -103,31 +169,43 @@ func NewClient(config *Config) (*Client, error) {
 // BaseURL of the Client. Relative URLS should always be specified without a preceding slash. If specified, the
 // value pointed to by body is JSON encoded and included in as the request body.
 func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body interface{}) (*http.Request, error) {
-	rel, err := url.Parse(urlStr)
+	u, err := c.BaseURL.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
-	u := c.BaseURL.ResolveReference(rel)
-
-	buf := new(bytes.Buffer)
-	if body != nil {
-		err = json.NewEncoder(buf).Encode(body)
+	var req *http.Request
+	switch method {
+	case http.MethodGet, http.MethodHead, http.MethodOptions:
+		req, err = http.NewRequest(method, u.String(), nil)
 		if err != nil {
 			return nil, err
 		}
+
+	default:
+		buf := new(bytes.Buffer)
+		if body != nil {
+			err = json.NewEncoder(buf).Encode(body)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		req, err = http.NewRequest(method, u.String(), buf)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("Content-Type", mediaType)
 	}
 
-	req, err := http.NewRequest(method, u.String(), buf)
-	if err != nil {
-		return nil, err
+	for k, v := range c.headers {
+		req.Header.Add(k, v)
 	}
+
+	req.Header.Set("Accept", mediaType)
+	req.Header.Set("User-Agent", c.UserAgent)
 
 	req.SetBasicAuth(c.Config.Username, c.Config.Password)
-
-	req.Header.Add("Content-Type", mediaType)
-	req.Header.Add("Accept", mediaType)
-	req.Header.Add("User-Agent", c.UserAgent)
 
 	return req, nil
 }
@@ -167,6 +245,11 @@ func (c *Client) NewManifestUploadRequest(ctx context.Context, method, urlStr st
 	req.Header.Add("User-Agent", c.UserAgent)
 
 	return req, nil
+}
+
+// OnRequestCompleted sets the Red Hat Satellite API request completion callback
+func (c *Client) OnRequestCompleted(rc RequestCompletionCallback) {
+	c.onRequestCompleted = rc
 }
 
 // Do sends an API request and returns the API response. The API response is JSON decoded and stored in the value
@@ -209,6 +292,11 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*htt
 	return resp, err
 }
 
+// DoRequest submits an HTTP request.
+func DoRequest(ctx context.Context, req *http.Request) (*http.Response, error) {
+	return DoRequestWithClient(ctx, http.DefaultClient, req)
+}
+
 // DoRequestWithClient submits an HTTP request using the specified client.
 func DoRequestWithClient(
 	ctx context.Context,
@@ -216,6 +304,20 @@ func DoRequestWithClient(
 	req *http.Request) (*http.Response, error) {
 	req = req.WithContext(ctx)
 	return client.Do(req)
+}
+
+func (r *ErrorResponse) Error() string {
+	allMessages := []string{}
+	if r.ErrorStruct != nil {
+		if r.ErrorStruct.FullMessages != nil {
+			allMessages = append(allMessages, *r.ErrorStruct.FullMessages...)
+		}
+		if r.ErrorStruct.Message != nil {
+			allMessages = append(allMessages, *r.ErrorStruct.Message)
+		}
+	}
+	return fmt.Sprintf("%v %v: %d %v",
+		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, strings.Join(allMessages, "|"))
 }
 
 // CheckResponse checks the API response for errors, and returns them if present. A response is considered an
@@ -238,28 +340,27 @@ func CheckResponse(r *http.Response) error {
 	return errorResponse
 }
 
-func (r *ErrorResponse) Error() string {
-	allMessages := []string{}
-	if r.ErrorStruct != nil {
-		if r.ErrorStruct.FullMessages != nil {
-			allMessages = append(allMessages, *r.ErrorStruct.FullMessages...)
-		}
-		if r.ErrorStruct.Message != nil {
-			allMessages = append(allMessages, *r.ErrorStruct.Message)
-		}
-	}
-	return fmt.Sprintf("%v %v: %d %v",
-		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, strings.Join(allMessages, "|"))
+// String is a helper routine that allocates a new string value
+// to store v and returns a pointer to it.
+func String(v string) *string {
+	p := new(string)
+	*p = v
+	return p
 }
 
-// An ErrorResponse reports the error caused by an API request
-type ErrorResponse struct {
-	// HTTP response that caused this error
-	Response *http.Response
+// Int is a helper routine that allocates a new int32 value
+// to store v and returns a pointer to it, but unlike Int32
+// its argument value is an int.
+func Int(v int) *int {
+	p := new(int)
+	*p = v
+	return p
+}
 
-	// Error message
-	ErrorStruct *struct {
-		FullMessages *[]string `json:"full_messages"`
-		Message      *string   `json:"message"`
-	} `json:"error"`
+// Bool is a helper routine that allocates a new bool value
+// to store v and returns a pointer to it.
+func Bool(v bool) *bool {
+	p := new(bool)
+	*p = v
+	return p
 }

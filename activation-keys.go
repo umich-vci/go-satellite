@@ -290,7 +290,7 @@ func (s *ActivationKeysOp) GetActivationKeyByID(ctx context.Context, akID int) (
 
 // ListActivationKeysByOrgID gets all activation keys or a filtered list of activation keys for a specific organization
 func (s *ActivationKeysOp) ListActivationKeysByOrgID(ctx context.Context, orgID int, akSearch ActivationKeySearch) (*ActivationKeyList, *http.Response, error) {
-	path := organizationsPath + strconv.Itoa(orgID) + "/activation_keys"
+	path := katelloOrganizationsPath + strconv.Itoa(orgID) + "/activation_keys"
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, akSearch)
 	if err != nil {

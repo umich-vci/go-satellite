@@ -89,7 +89,7 @@ type ProductsOp struct {
 
 // ListProductsByOrgID gets all products or a filtered list of products for a specific organization
 func (s *ProductsOp) ListProductsByOrgID(ctx context.Context, orgID int, prodSearch ProductSearch) (*ProductsList, *http.Response, error) {
-	path := organizationsPath + strconv.Itoa(orgID) + "/products"
+	path := katelloOrganizationsPath + strconv.Itoa(orgID) + "/products"
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, prodSearch)
 	if err != nil {

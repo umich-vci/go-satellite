@@ -63,7 +63,7 @@ type HostCollections interface {
 
 // CreateHostCollection creates a new host collection
 func (s *HostCollectionsOp) CreateHostCollection(ctx context.Context, orgID int, hcCreate HostCollectionCreate) (*HostCollection, *http.Response, error) {
-	path := organizationsPath + "/" + strconv.Itoa(orgID) + "/host_collections"
+	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID) + "/host_collections"
 
 	if hcCreate.Name == "" {
 		return nil, nil, NewArgError("hcCreate.Name", "cannot be empty")

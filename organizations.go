@@ -6,7 +6,8 @@ import (
 	"strconv"
 )
 
-const organizationsPath = katelloBasePath + "/organizations"
+const katelloOrganizationsPath = katelloBasePath + "/organizations"
+const organizationsPath = basePath + "/organizations"
 
 type orgOwnerDetails struct {
 	AutobindDisabled      *bool                     `json:"autobindDisabled"`
@@ -174,7 +175,7 @@ type OrganizationsOp struct {
 
 // CreateOrganization creates a new organization
 func (s *OrganizationsOp) CreateOrganization(ctx context.Context, orgCreate OrganizationCreate) (*Organization, *http.Response, error) {
-	path := organizationsPath
+	path := katelloOrganizationsPath
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, orgCreate)
 	if err != nil {
@@ -191,7 +192,7 @@ func (s *OrganizationsOp) CreateOrganization(ctx context.Context, orgCreate Orga
 
 // DeleteOrganization deletes an organization by its ID
 func (s *OrganizationsOp) DeleteOrganization(ctx context.Context, orgID int) (*http.Response, error) {
-	path := organizationsPath + "/" + strconv.Itoa(orgID)
+	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
@@ -207,7 +208,7 @@ func (s *OrganizationsOp) DeleteOrganization(ctx context.Context, orgID int) (*h
 
 // GetOrganizationByID gets a single Organization by its ID
 func (s *OrganizationsOp) GetOrganizationByID(ctx context.Context, orgID int) (*Organization, *http.Response, error) {
-	path := organizationsPath + "/" + strconv.Itoa(orgID)
+	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID)
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -224,7 +225,7 @@ func (s *OrganizationsOp) GetOrganizationByID(ctx context.Context, orgID int) (*
 
 // UpdateOrganization the settings of an organization by its ID
 func (s *OrganizationsOp) UpdateOrganization(ctx context.Context, orgID int, update OrganizationUpdate) (*Organization, *http.Response, error) {
-	path := organizationsPath + "/" + strconv.Itoa(orgID)
+	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, update)
 	if err != nil {
