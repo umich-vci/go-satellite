@@ -2,6 +2,7 @@ package gosatellite
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -41,19 +42,54 @@ type ActivationKeyList struct {
 	Results *[]ActivationKey `json:"results"`
 }
 
-// ActivationKeySearch defines model for searching a list of activation keys.
-type ActivationKeySearch struct {
-	OrganizationID *int    `json:"organization_id,omitempty"`
-	EnvironmentID  *int    `json:"environment_id,omitempty"`
-	ContentViewID  *int    `json:"content_view_id,omitempty"`
-	Name           *string `json:"name,omitempty"`
-	Search         *string `json:"search,omitempty"`
-	Page           *int    `json:"page,omitempty"`
-	PerPage        *int    `json:"per_page,omitempty"`
-	Order          *string `json:"order,omitempty"`
-	FullResult     *bool   `json:"full_result,omitempty"`
-	SortBy         *string `json:"sort_by,omitempty"`
-	SortOrder      *string `json:"sort_order,omitempty"`
+// ActivationKeyReleasesList defines model for a list of releases available for an activation keys.
+type ActivationKeyReleasesList struct {
+	searchResults
+	Error   *string   `json:"error"`
+	Results *[]string `json:"results"`
+}
+
+// ActivationKeyProductContentList defines model for a list of products available for an activation keys.
+type ActivationKeyProductContentList struct {
+	searchResults
+	Error   *string   `json:"error"`
+	Results *[]string `json:"results"`
+}
+
+// ActivationKeyListOptions specifies the optional parameters to various List methods that
+// support pagination.
+type ActivationKeyListOptions struct {
+	KatelloListOptions
+
+	// Filter by content view id
+	ContentViewID int `url:"content_view_id,omitempty"`
+
+	// Scope by environment
+	EnvironmentID int `url:"environment_id,omitempty"`
+
+	// Filter by name
+	Name string `url:"name,omitempty"`
+
+	// Scope by organizations
+	OrganizationID int `url:"organization_id,omitempty"`
+}
+
+// ActivationKeyAvailableHostCollectionsListOptions specifies the optional parameters to various List methods that
+// support pagination.
+type ActivationKeyAvailableHostCollectionsListOptions struct {
+	KatelloListOptions
+
+	// Filter by content view id
+	ContentViewID int `url:"content_view_id,omitempty"`
+
+	// Scope by environment
+	EnvironmentID int `url:"environment_id,omitempty"`
+
+	// Filter by name
+	Name string `url:"name,omitempty"`
+
+	// Scope by organizations
+	OrganizationID int `url:"organization_id,omitempty"`
 }
 
 // ActivationKeyCreate defines model for creating an activation key.
@@ -112,43 +148,24 @@ type ActivationKeysOp struct {
 // ActivationKeys is an interface for interacting with
 // Red Hat Satellite Activation Keys
 type ActivationKeys interface {
-	AssociateHostCollectionsWithActivationKey(ctx context.Context, akID int, hostCollections []int) (*ActivationKey, *http.Response, error)
-	CreateActivationKey(ctx context.Context, akCreate ActivationKeyCreate) (*ActivationKey, *http.Response, error)
-	DeleteActivationKey(ctx context.Context, akID int) (*http.Response, error)
-	DisassociateHostCollectionsWithActivationKey(ctx context.Context, akID int, hostCollections []int) (*ActivationKey, *http.Response, error)
-	GetActivationKeyByID(ctx context.Context, akID int) (*ActivationKey, *http.Response, error)
-	UpdateActivationKey(ctx context.Context, akID int, akUpdate ActivationKeyUpdate) (*ActivationKey, *http.Response, error)
+	AssociateHostCollections(ctx context.Context, akID int, hostCollections []int) (*ActivationKey, *http.Response, error)
+	AttachSubscription(ctx context.Context, akID int, subscriptionID int, quantity int) (*ActivationKey, *http.Response, error)
+	ContentOverride(ctx context.Context, akID int, contentOverride ActivationKeyContentOverride) (*ActivationKey, *http.Response, error)
+	Create(ctx context.Context, akCreate ActivationKeyCreate) (*ActivationKey, *http.Response, error)
+	Delete(ctx context.Context, akID int) (*http.Response, error)
+	DisassociateHostCollections(ctx context.Context, akID int, hostCollections []int) (*ActivationKey, *http.Response, error)
+	Get(ctx context.Context, akID int) (*ActivationKey, *http.Response, error)
+	List(ctx context.Context, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error)
+	ListByEnvironmentID(ctx context.Context, envID int, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error)
+	ListByOrganizationID(ctx context.Context, orgID int, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error)
+	ListReleases(ctx context.Context, akID int) (*ActivationKeyReleasesList, *http.Response, error)
+	Update(ctx context.Context, akID int, akUpdate ActivationKeyUpdate) (*ActivationKey, *http.Response, error)
+	UnattachSubscription(ctx context.Context, akID int, subscriptionID int) (*ActivationKey, *http.Response, error)
 }
 
-// AttachSubscriptionToActivationKey attaches a subscription to an activation key
-func (s *ActivationKeysOp) AttachSubscriptionToActivationKey(ctx context.Context, akID int, subscriptionID int, quantity int) (*ActivationKey, *http.Response, error) {
-	path := activationKeyPath + "/" + strconv.Itoa(akID) + "/add_subscriptions"
-
-	var body struct {
-		SubscriptionID int `json:"subscription_id"`
-		Quantity       int `json:"quantity"`
-	}
-
-	body.SubscriptionID = subscriptionID
-	body.Quantity = quantity
-
-	req, err := s.client.NewRequest(ctx, http.MethodPut, path, body)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	activationKey := new(ActivationKey)
-	resp, err := s.client.Do(ctx, req, activationKey)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return activationKey, resp, nil
-}
-
-// AssociateHostCollectionsWithActivationKey associates a list of host collections with an activation key
-func (s *ActivationKeysOp) AssociateHostCollectionsWithActivationKey(ctx context.Context, akID int, hostCollections []int) (*ActivationKey, *http.Response, error) {
-	path := activationKeyPath + "/" + strconv.Itoa(akID) + "/host_collections"
+// AssociateHostCollections with an activation key
+func (s *ActivationKeysOp) AssociateHostCollections(ctx context.Context, akID int, hostCollections []int) (*ActivationKey, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/host_collections", activationKeyPath, akID)
 
 	if len(hostCollections) < 1 {
 		return nil, nil, NewArgError("hostCollections", "cannot be empty")
@@ -174,15 +191,17 @@ func (s *ActivationKeysOp) AssociateHostCollectionsWithActivationKey(ctx context
 	return activationKey, resp, nil
 }
 
-// UnattachSubscriptionFromActivationKey detaches a subscription from an activation key
-func (s *ActivationKeysOp) UnattachSubscriptionFromActivationKey(ctx context.Context, akID int, subscriptionID int) (*ActivationKey, *http.Response, error) {
-	path := activationKeyPath + "/" + strconv.Itoa(akID) + "/remove_subscriptions"
+// AttachSubscription attaches a subscription to an activation key
+func (s *ActivationKeysOp) AttachSubscription(ctx context.Context, akID int, subscriptionID int, quantity int) (*ActivationKey, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/add_subscriptions", activationKeyPath, akID)
 
 	var body struct {
 		SubscriptionID int `json:"subscription_id"`
+		Quantity       int `json:"quantity"`
 	}
 
 	body.SubscriptionID = subscriptionID
+	body.Quantity = quantity
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, body)
 	if err != nil {
@@ -198,21 +217,17 @@ func (s *ActivationKeysOp) UnattachSubscriptionFromActivationKey(ctx context.Con
 	return activationKey, resp, nil
 }
 
-// DisassociateHostCollectionsWithActivationKey disassociates a list of host collections with an activation key
-func (s *ActivationKeysOp) DisassociateHostCollectionsWithActivationKey(ctx context.Context, akID int, hostCollections []int) (*ActivationKey, *http.Response, error) {
-	path := activationKeyPath + "/" + strconv.Itoa(akID) + "/host_collections"
+// ContentOverride overrides the content an activation key
+func (s *ActivationKeysOp) ContentOverride(ctx context.Context, akID int, contentOverride ActivationKeyContentOverride) (*ActivationKey, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/content_override", activationKeyPath, akID)
 
-	if len(hostCollections) < 1 {
-		return nil, nil, NewArgError("hostCollections", "cannot be empty")
+	if contentOverride.ContentOverrides.Name == nil {
+		return nil, nil, NewArgError("contentOverride.Name", "cannot be empty")
+	} else if *contentOverride.ContentOverrides.Name == "" {
+		return nil, nil, NewArgError("contentOverride.Name", "cannot be empty")
 	}
 
-	var body struct {
-		HostCollectionIDs []int `json:"host_collection_ids"`
-	}
-
-	body.HostCollectionIDs = hostCollections
-
-	req, err := s.client.NewRequest(ctx, http.MethodPut, path, body)
+	req, err := s.client.NewRequest(ctx, http.MethodPut, path, contentOverride)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -226,8 +241,8 @@ func (s *ActivationKeysOp) DisassociateHostCollectionsWithActivationKey(ctx cont
 	return activationKey, resp, nil
 }
 
-// CreateActivationKey creates a new activation key
-func (s *ActivationKeysOp) CreateActivationKey(ctx context.Context, akCreate ActivationKeyCreate) (*ActivationKey, *http.Response, error) {
+// Create a new activation key
+func (s *ActivationKeysOp) Create(ctx context.Context, akCreate ActivationKeyCreate) (*ActivationKey, *http.Response, error) {
 	path := activationKeyPath
 
 	if akCreate.OrganizationID == nil {
@@ -254,8 +269,8 @@ func (s *ActivationKeysOp) CreateActivationKey(ctx context.Context, akCreate Act
 	return activationKey, resp, nil
 }
 
-// DeleteActivationKey deletes an activation key by its ID
-func (s *ActivationKeysOp) DeleteActivationKey(ctx context.Context, akID int) (*http.Response, error) {
+// Delete an activation key by its ID
+func (s *ActivationKeysOp) Delete(ctx context.Context, akID int) (*http.Response, error) {
 	path := activationKeyPath + "/" + strconv.Itoa(akID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
@@ -270,9 +285,37 @@ func (s *ActivationKeysOp) DeleteActivationKey(ctx context.Context, akID int) (*
 	return resp, err
 }
 
-// GetActivationKeyByID gets a single activation key by its ID
-func (s *ActivationKeysOp) GetActivationKeyByID(ctx context.Context, akID int) (*ActivationKey, *http.Response, error) {
-	path := activationKeyPath + "/" + strconv.Itoa(akID)
+// DisassociateHostCollections disassociates a list of host collections with an activation key
+func (s *ActivationKeysOp) DisassociateHostCollections(ctx context.Context, akID int, hostCollections []int) (*ActivationKey, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/host_collections", activationKeyPath, akID)
+
+	if len(hostCollections) < 1 {
+		return nil, nil, NewArgError("hostCollections", "cannot be empty")
+	}
+
+	var body struct {
+		HostCollectionIDs []int `json:"host_collection_ids"`
+	}
+
+	body.HostCollectionIDs = hostCollections
+
+	req, err := s.client.NewRequest(ctx, http.MethodPut, path, body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	activationKey := new(ActivationKey)
+	resp, err := s.client.Do(ctx, req, activationKey)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return activationKey, resp, nil
+}
+
+// Get a single activation key by its ID
+func (s *ActivationKeysOp) Get(ctx context.Context, akID int) (*ActivationKey, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", activationKeyPath, akID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
@@ -288,48 +331,117 @@ func (s *ActivationKeysOp) GetActivationKeyByID(ctx context.Context, akID int) (
 	return activationKey, resp, nil
 }
 
-// ListActivationKeysByOrgID gets all activation keys or a filtered list of activation keys for a specific organization
-func (s *ActivationKeysOp) ListActivationKeysByOrgID(ctx context.Context, orgID int, akSearch ActivationKeySearch) (*ActivationKeyList, *http.Response, error) {
-	path := katelloOrganizationsPath + strconv.Itoa(orgID) + "/activation_keys"
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, akSearch)
+// Performs a list request given a path.
+func (s *ActivationKeysOp) list(ctx context.Context, path string) (*ActivationKeyList, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	activationKeys := new(ActivationKeyList)
-	resp, err := s.client.Do(ctx, req, activationKeys)
+	list := new(ActivationKeyList)
+	resp, err := s.client.Do(ctx, req, list)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return activationKeys, resp, nil
+	return list, resp, err
 }
 
-// ListActivationKeys gets all activation keys or a filtered list of activation keys
-func (s *ActivationKeysOp) ListActivationKeys(ctx context.Context, akSearch ActivationKeySearch) (*ActivationKeyList, *http.Response, error) {
+// List all activation keys or a filtered list of activation keys
+func (s *ActivationKeysOp) List(ctx context.Context, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error) {
 	path := activationKeyPath
 
-	if akSearch.OrganizationID == nil && akSearch.EnvironmentID == nil {
-		return nil, nil, NewArgError("Both akSearch.OrganizationID and akSearch.EnvironmentID", "cannot be empty")
+	if opt.OrganizationID == 0 && opt.EnvironmentID == 0 {
+		return nil, nil, NewArgError("Both opt.OrganizationID and opt.EnvironmentID", "cannot be empty")
 	}
 
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, akSearch)
+	path, err := addOptions(path, opt)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	activationKeys := new(ActivationKeyList)
-	resp, err := s.client.Do(ctx, req, activationKeys)
+	return s.list(ctx, path)
+}
+
+// ListAvailableHostCollections for an activation key
+// func (s *ActivationKeysOp) ListAvailableHostCollections(ctx context.Context, akID int, opt ActivationKeyAvailableHostCollectionsListOptions) (*ActivationKeyList, *http.Response, error) {
+// 	path := fmt.Sprintf("%s/%d/host_collections/available", activationKeyPath, akID)
+
+// 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+// 	if err != nil {
+// 		return nil, nil, err
+// 	}
+
+// 	activationKey := new(ActivationKey)
+// 	resp, err := s.client.Do(ctx, req, activationKey)
+// 	if err != nil {
+// 		return nil, resp, err
+// 	}
+
+// 	return activationKey, resp, nil
+
+// }
+
+// ListByEnvironmentID gets all activation keys or a filtered list of activation keys for a specific environment
+func (s *ActivationKeysOp) ListByEnvironmentID(ctx context.Context, envID int, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/activation_keys", katelloEnvironmentsPath, envID)
+	path, err := addOptions(path, opt)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return s.list(ctx, path)
+}
+
+// ListByOrganizationID gets all activation keys or a filtered list of activation keys for a specific organization
+func (s *ActivationKeysOp) ListByOrganizationID(ctx context.Context, orgID int, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/activation_keys", katelloOrganizationsPath, orgID)
+	path, err := addOptions(path, opt)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return s.list(ctx, path)
+}
+
+// ListProductContent for an activation key
+// func (s *ActivationKeysOp) ListProductContent(ctx context.Context, akID int, opt ActivationKeyListOptions) (*ActivationProductContentList, *http.Response, error) {
+// 	path := fmt.Sprintf("%s/%d/releases", activationKeyPath, akID)
+
+// 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+// 	if err != nil {
+// 		return nil, nil, err
+// 	}
+
+// 	releases := new(ActivationKeyReleasesList)
+// 	resp, err := s.client.Do(ctx, req, releases)
+// 	if err != nil {
+// 		return nil, resp, err
+// 	}
+
+// 	return releases, resp, nil
+// }
+
+// ListReleases for an activation key
+func (s *ActivationKeysOp) ListReleases(ctx context.Context, akID int) (*ActivationKeyReleasesList, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/releases", activationKeyPath, akID)
+
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	releases := new(ActivationKeyReleasesList)
+	resp, err := s.client.Do(ctx, req, releases)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return activationKeys, resp, nil
+	return releases, resp, nil
 }
 
-// UpdateActivationKey updates an activation key
-func (s *ActivationKeysOp) UpdateActivationKey(ctx context.Context, akID int, akUpdate ActivationKeyUpdate) (*ActivationKey, *http.Response, error) {
+// Update an activation key
+func (s *ActivationKeysOp) Update(ctx context.Context, akID int, akUpdate ActivationKeyUpdate) (*ActivationKey, *http.Response, error) {
 	path := activationKeyPath + "/" + strconv.Itoa(akID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, akUpdate)
@@ -346,17 +458,17 @@ func (s *ActivationKeysOp) UpdateActivationKey(ctx context.Context, akID int, ak
 	return activationKey, resp, nil
 }
 
-// OverrideContentForActivationKey overrides the content an activation key
-func (s *ActivationKeysOp) OverrideContentForActivationKey(ctx context.Context, akID int, contentOverride ActivationKeyContentOverride) (*ActivationKey, *http.Response, error) {
-	path := activationKeyPath + "/" + strconv.Itoa(akID) + "/content_override"
+// UnattachSubscription detaches a subscription from an activation key
+func (s *ActivationKeysOp) UnattachSubscription(ctx context.Context, akID int, subscriptionID int) (*ActivationKey, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/remove_subscriptions", activationKeyPath, akID)
 
-	if contentOverride.ContentOverrides.Name == nil {
-		return nil, nil, NewArgError("contentOverride.Name", "cannot be empty")
-	} else if *contentOverride.ContentOverrides.Name == "" {
-		return nil, nil, NewArgError("contentOverride.Name", "cannot be empty")
+	var body struct {
+		SubscriptionID int `json:"subscription_id"`
 	}
 
-	req, err := s.client.NewRequest(ctx, http.MethodPut, path, contentOverride)
+	body.SubscriptionID = subscriptionID
+
+	req, err := s.client.NewRequest(ctx, http.MethodPut, path, body)
 	if err != nil {
 		return nil, nil, err
 	}

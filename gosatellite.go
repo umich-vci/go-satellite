@@ -76,14 +76,8 @@ type RequestCompletionCallback func(*http.Request, *http.Response)
 // ListOptions specifies the optional parameters to various List methods that
 // support pagination.
 type ListOptions struct {
-	// Scope by locations
-	LocationID int `url:"location_id,omitempty"`
-
 	// Sort field and order, eg. ‘id DESC’
 	Order string `url:"order,omitempty"`
-
-	// Scope by organizations
-	OrganizationID int `url:"organization_id,omitempty"`
 
 	// For paginated result sets, page of results to retrieve.
 	Page int `url:"page,omitempty"`
@@ -93,6 +87,21 @@ type ListOptions struct {
 
 	// A search string used to filter results
 	Search string `url:"search,omitempty"`
+}
+
+// KatelloListOptions specifies the optional parameters to various List methods that
+// support pagination for APIs backed by Katello.
+type KatelloListOptions struct {
+	ListOptions
+
+	// Whether or not to show all results
+	FullResult *bool `url:"full_result,omitempty"`
+
+	// Field to sort the results on
+	SortBy string `url:"sort_by,omitempty"`
+
+	// How to order the sorted results (e.g. ASC for ascending)
+	SortOrder string `url:"sort_order,omitempty"`
 }
 
 // An ErrorResponse reports the error caused by an API request
