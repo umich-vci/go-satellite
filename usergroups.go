@@ -165,7 +165,7 @@ func (s *UserGroupsOp) DeleteUserGroup(ctx context.Context, userGroupID int) (*U
 	return userGroup, resp, err
 }
 
-// GetUserGroupByID gets a external user group by its ID
+// GetExternalUserGroupByID gets a external user group by its ID
 func (s *UserGroupsOp) GetExternalUserGroupByID(ctx context.Context, userGroupID int, externalUserGroupID int) (*ExternalUserGroup, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d/external_usergroups/%d", rolesPath, userGroupID, externalUserGroupID)
 
@@ -201,7 +201,7 @@ func (s *UserGroupsOp) GetUserGroupByID(ctx context.Context, userGroupID int) (*
 	return userGroup, resp, err
 }
 
-// UpdateUserGroup updates a user group
+// UpdateExternalUserGroup updates a user group
 func (s *UserGroupsOp) UpdateExternalUserGroup(ctx context.Context, userGroupID int, externalUserGroupID int, externalUserGroupUpdate ExternalUserGroupUpdate) (*ExternalUserGroup, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d/external_usergroups/%d", rolesPath, userGroupID, externalUserGroupID)
 
