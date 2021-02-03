@@ -42,8 +42,20 @@ type AuthSourceLDAPList struct {
 	Results *[]AuthSourceLDAP `json:"results"`
 }
 
-// UserGroups is an interface for interacting with
-// Red Hat Satellite roles
+// AuthSourceLDAPsListOptions specifies the optional parameters to various List methods that
+// support pagination.
+type AuthSourceLDAPsListOptions struct {
+	ListOptions
+
+	// Scope by locations
+	LocationID int `url:"location_id,omitempty"`
+
+	// Scope by organizations
+	OrganizationID int `url:"organization_id,omitempty"`
+}
+
+// AuthSourceLDAPs is an interface for interacting with
+// Red Hat Satellite Auth Source LDAPs
 type AuthSourceLDAPs interface {
 }
 
