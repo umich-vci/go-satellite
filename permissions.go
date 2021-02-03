@@ -2,8 +2,8 @@ package gosatellite
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"strconv"
 )
 
 const permissionsPath = basePath + "/permissions"
@@ -19,6 +19,18 @@ type Permission struct {
 type PermissionsList struct {
 	searchResults
 	Results *[]Permission `json:"results"`
+}
+
+// PermissionsListOptions specifies the optional parameters to various List methods that
+// support pagination.
+type PermissionsListOptions struct {
+	ListOptions
+
+	// Scope by locations
+	LocationID int `url:"location_id,omitempty"`
+
+	// Scope by organizations
+	OrganizationID int `url:"organization_id,omitempty"`
 }
 
 // PermissionsSearch defines model for searching a list of permissions.
@@ -40,8 +52,8 @@ type ResourceTypes struct {
 // Permissions is an interface for interacting with
 // Red Hat Satellite permissions
 type Permissions interface {
-	GetPermissionByID(ctx context.Context, permissionID int) (*Permission, *http.Response, error)
-	ListPermissions(ctx context.Context, permSearch PermissionsSearch) (*PermissionsList, *http.Response, error)
+	Get(ctx context.Context, permissionID int) (*Permission, *http.Response, error)
+	List(ctx context.Context, opt PermissionsListOptions) (*PermissionsList, *http.Response, error)
 }
 
 // PermissionsOp handles communication with the Permissions related methods of the
@@ -50,9 +62,9 @@ type PermissionsOp struct {
 	client *Client
 }
 
-// GetPermissionByID gets a single permission by its ID
-func (s *PermissionsOp) GetPermissionByID(ctx context.Context, permissionID int) (*Permission, *http.Response, error) {
-	path := permissionsPath + "/" + strconv.Itoa(permissionID)
+// Get a single permission by its ID
+func (s *PermissionsOp) Get(ctx context.Context, permissionID int) (*Permission, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", permissionsPath, permissionID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
@@ -68,11 +80,15 @@ func (s *PermissionsOp) GetPermissionByID(ctx context.Context, permissionID int)
 	return permission, resp, err
 }
 
-// ListPermissions gets all permissions or a filtered list of permissions
-func (s *PermissionsOp) ListPermissions(ctx context.Context, permSearch PermissionsSearch) (*PermissionsList, *http.Response, error) {
+// List all permissions or a filtered list of permissions
+func (s *PermissionsOp) List(ctx context.Context, opt PermissionsListOptions) (*PermissionsList, *http.Response, error) {
 	path := permissionsPath
+	path, err := addOptions(path, opt)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, permSearch)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}

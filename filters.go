@@ -2,8 +2,8 @@ package gosatellite
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"strconv"
 )
 
 const filtersPath = basePath + "/filters"
@@ -63,10 +63,10 @@ type FilterUpdate struct {
 // Filters is an interface for interacting with
 // Red Hat Satellite role filters
 type Filters interface {
-	CreateFilter(ctx context.Context, filterCreate FilterCreate) (*Filter, *http.Response, error)
-	DeleteFilter(ctx context.Context, filterID int) (*http.Response, error)
-	GetFilterByID(ctx context.Context, filterID int) (*Filter, *http.Response, error)
-	UpdateFilter(ctx context.Context, filterID int, filterUpdate FilterUpdate) (*Filter, *http.Response, error)
+	Create(ctx context.Context, filterCreate FilterCreate) (*Filter, *http.Response, error)
+	Delete(ctx context.Context, filterID int) (*http.Response, error)
+	Get(ctx context.Context, filterID int) (*Filter, *http.Response, error)
+	Update(ctx context.Context, filterID int, filterUpdate FilterUpdate) (*Filter, *http.Response, error)
 }
 
 // FiltersOp handles communication with the Filter related methods of the
@@ -75,8 +75,8 @@ type FiltersOp struct {
 	client *Client
 }
 
-// CreateFilter creates a new filter
-func (s *FiltersOp) CreateFilter(ctx context.Context, filterCreate FilterCreate) (*Filter, *http.Response, error) {
+// Create a new filter
+func (s *FiltersOp) Create(ctx context.Context, filterCreate FilterCreate) (*Filter, *http.Response, error) {
 	path := filtersPath
 
 	if filterCreate.Filter.RoleID == nil {
@@ -96,9 +96,10 @@ func (s *FiltersOp) CreateFilter(ctx context.Context, filterCreate FilterCreate)
 	return filter, resp, err
 }
 
-// DeleteFilter deletes a single filter by its ID
-func (s *FiltersOp) DeleteFilter(ctx context.Context, filterID int) (*http.Response, error) {
-	path := filtersPath + "/" + strconv.Itoa(filterID)
+// Delete a single filter by its ID
+func (s *FiltersOp) Delete(ctx context.Context, filterID int) (*http.Response, error) {
+	path := fmt.Sprintf("%s/%d", filtersPath, filterID)
+
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
 		return nil, err
@@ -112,9 +113,10 @@ func (s *FiltersOp) DeleteFilter(ctx context.Context, filterID int) (*http.Respo
 	return resp, err
 }
 
-// GetFilterByID gets a single filter by its ID
-func (s *FiltersOp) GetFilterByID(ctx context.Context, filterID int) (*Filter, *http.Response, error) {
-	path := filtersPath + "/" + strconv.Itoa(filterID)
+// Get a single filter by its ID
+func (s *FiltersOp) Get(ctx context.Context, filterID int) (*Filter, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", filtersPath, filterID)
+
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -129,9 +131,9 @@ func (s *FiltersOp) GetFilterByID(ctx context.Context, filterID int) (*Filter, *
 	return filter, resp, err
 }
 
-// UpdateFilter updates a filter
-func (s *FiltersOp) UpdateFilter(ctx context.Context, filterID int, filterUpdate FilterUpdate) (*Filter, *http.Response, error) {
-	path := filtersPath + "/" + strconv.Itoa(filterID)
+// Update a filter
+func (s *FiltersOp) Update(ctx context.Context, filterID int, filterUpdate FilterUpdate) (*Filter, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", filtersPath, filterID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, filterUpdate)
 	if err != nil {

@@ -2,8 +2,8 @@ package gosatellite
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"strconv"
 )
 
 // ManifestHistoryItem defines model for a single manifest history
@@ -30,10 +30,10 @@ type ManifestUpload struct {
 // Manifests is an interface for interacting with
 // Red Hat Satellite Subscription Manifests
 type Manifests interface {
-	DeleteManifest(ctx context.Context, orgID int) (*http.Response, error)
-	GetManifestHistory(ctx context.Context, orgID int) (*[]ManifestHistoryItem, *http.Response, error)
-	RefreshManifest(ctx context.Context, orgID int) (*http.Response, error)
-	UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte, manifestFilename string) (*ManifestUpload, *http.Response, error)
+	Delete(ctx context.Context, orgID int) (*http.Response, error)
+	GetHistory(ctx context.Context, orgID int) (*[]ManifestHistoryItem, *http.Response, error)
+	Refresh(ctx context.Context, orgID int) (*http.Response, error)
+	Upload(ctx context.Context, orgID int, repoURL *string, manifest []byte, manifestFilename string) (*ManifestUpload, *http.Response, error)
 }
 
 // ManifestsOp handles communication with the Manifest related methods of the
@@ -42,9 +42,9 @@ type ManifestsOp struct {
 	client *Client
 }
 
-// DeleteManifest deletes a manifest for an organization by its ID
-func (s *ManifestsOp) DeleteManifest(ctx context.Context, orgID int) (*http.Response, error) {
-	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/delete_manifest"
+// Delete a manifest for an organization by its ID
+func (s *ManifestsOp) Delete(ctx context.Context, orgID int) (*http.Response, error) {
+	path := fmt.Sprintf("%s/%d/subscriptions/delete_manifest", katelloOrganizationsPath, orgID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
 	if err != nil {
@@ -58,9 +58,10 @@ func (s *ManifestsOp) DeleteManifest(ctx context.Context, orgID int) (*http.Resp
 	return resp, err
 }
 
-// GetManifestHistory gets the manifest history for an organization based on its ID
-func (s *ManifestsOp) GetManifestHistory(ctx context.Context, orgID int) (*[]ManifestHistoryItem, *http.Response, error) {
-	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/manifest_history"
+// GetHistory of a manifest for an organization based on its ID
+func (s *ManifestsOp) GetHistory(ctx context.Context, orgID int) (*[]ManifestHistoryItem, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/subscriptions/manifest_history", katelloOrganizationsPath, orgID)
+
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -75,9 +76,9 @@ func (s *ManifestsOp) GetManifestHistory(ctx context.Context, orgID int) (*[]Man
 	return hist, resp, err
 }
 
-// RefreshManifest refreshes the manifest attached to an organization
-func (s *ManifestsOp) RefreshManifest(ctx context.Context, orgID int) (*http.Response, error) {
-	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/refresh_manifest"
+// Refresh the manifest attached to an organization
+func (s *ManifestsOp) Refresh(ctx context.Context, orgID int) (*http.Response, error) {
+	path := fmt.Sprintf("%s/%d/subscriptions/refresh_manifest", katelloOrganizationsPath, orgID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, nil)
 	if err != nil {
@@ -92,9 +93,9 @@ func (s *ManifestsOp) RefreshManifest(ctx context.Context, orgID int) (*http.Res
 	return resp, err
 }
 
-// UploadManifest uploads a manifest to an organization
-func (s *ManifestsOp) UploadManifest(ctx context.Context, orgID int, repoURL *string, manifest []byte, manifestFilename string) (*ManifestUpload, *http.Response, error) {
-	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID) + "/subscriptions/upload"
+// Upload a manifest to an organization
+func (s *ManifestsOp) Upload(ctx context.Context, orgID int, repoURL *string, manifest []byte, manifestFilename string) (*ManifestUpload, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/subscriptions/upload", katelloOrganizationsPath, orgID)
 
 	req, err := s.client.NewManifestUploadRequest(ctx, http.MethodPost, path, manifest, manifestFilename)
 	if err != nil {

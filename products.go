@@ -2,8 +2,8 @@ package gosatellite
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"strconv"
 )
 
 const productsPath = katelloBasePath + "/products"
@@ -54,31 +54,44 @@ type ProductsList struct {
 	Results *[]Product `json:"results"`
 }
 
-// ProductSearch defines model for searching a list of products.
-type ProductSearch struct {
-	OrganizationID          *int    `json:"organization_id,omitempty"`
-	SubscriptionID          *int    `json:"subscription_id,omitempty"`
-	Name                    *string `json:"name,omitempty"`
-	Enabled                 *bool   `json:"enabled,omitempty"`
-	Custom                  *bool   `json:"custom,omitempty"`
-	RedHatOnly              *bool   `json:"redhat_only,omitempty"`
-	IncludeAvailableContent *bool   `json:"include_available_content,omitempty"`
-	SyncPlanID              *int    `json:"sync_plan_id,omitempty"`
-	AvailableFor            *string `json:"available_for,omitempty"`
-	Search                  *string `json:"search,omitempty"`
-	Page                    *int    `json:"page,omitempty"`
-	PerPage                 *int    `json:"per_page,omitempty"`
-	Order                   *string `json:"order,omitempty"`
-	FullResult              *bool   `json:"full_result,omitempty"`
-	SortBy                  *string `json:"sort_by,omitempty"`
-	SortOrder               *string `json:"sort_order,omitempty"`
+// ProductsListOptions specifies the optional parameters to various List methods that
+// support pagination.
+type ProductsListOptions struct {
+	KatelloListOptions
+
+	// Filter products by organization
+	OrganizationID int `url:"organization_id,omitempty"`
+
+	// Filter products by subscription
+	SubscriptionID int `url:"subscription_id,omitempty"`
+
+	// Filter products by name
+	Name string `url:"name,omitempty"`
+
+	// Return enabled products only
+	Enabled bool `url:"enabled,omitempty"`
+
+	// Return custom products only
+	Custom bool `url:"custom,omitempty"`
+
+	// Return Red Hat (non-custom) products only
+	RedHatOnly bool `url:"redhat_only,omitempty"`
+
+	// Whether to include available content attribute in results
+	IncludeAvailableContent bool `url:"include_available_content,omitempty"`
+
+	// Filter products by sync plan id
+	SyncPlanID int `url:"sync_plan_id,omitempty"`
+
+	// Interpret specified object to return only Products that can be associated with specified object. Only 'sync_plan' is supported.
+	AvailableFor string `url:"available_for,omitempty"`
 }
 
 // Products is an interface for interacting with
 // Red Hat Satellite products
 type Products interface {
-	ListProductsByOrgID(ctx context.Context, orgID int, prodSearch ProductSearch) (*ProductsList, *http.Response, error)
-	ListProducts(ctx context.Context, prodSearch ProductSearch) (*ProductsList, *http.Response, error)
+	ListByOrgID(ctx context.Context, orgID int, opt ProductsListOptions) (*ProductsList, *http.Response, error)
+	List(ctx context.Context, opt ProductsListOptions) (*ProductsList, *http.Response, error)
 }
 
 // ProductsOp handles communication with the Product related methods of the
@@ -87,38 +100,40 @@ type ProductsOp struct {
 	client *Client
 }
 
-// ListProductsByOrgID gets all products or a filtered list of products for a specific organization
-func (s *ProductsOp) ListProductsByOrgID(ctx context.Context, orgID int, prodSearch ProductSearch) (*ProductsList, *http.Response, error) {
-	path := katelloOrganizationsPath + strconv.Itoa(orgID) + "/products"
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, prodSearch)
+// Performs a list request given a path.
+func (s *ProductsOp) list(ctx context.Context, path string) (*ProductsList, *http.Response, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	products := new(ProductsList)
-	resp, err := s.client.Do(ctx, req, products)
+	list := new(ProductsList)
+	resp, err := s.client.Do(ctx, req, list)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return products, resp, err
+	return list, resp, err
 }
 
-// ListProducts gets all products or a filtered list of products
-func (s *ProductsOp) ListProducts(ctx context.Context, prodSearch ProductSearch) (*ProductsList, *http.Response, error) {
-	path := productsPath
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, prodSearch)
+// ListByOrgID all products or a filtered list of products for a specific organization
+func (s *ProductsOp) ListByOrgID(ctx context.Context, orgID int, opt ProductsListOptions) (*ProductsList, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/products", katelloOrganizationsPath, orgID)
+	path, err := addOptions(path, opt)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	products := new(ProductsList)
-	resp, err := s.client.Do(ctx, req, products)
+	return s.list(ctx, path)
+}
+
+// List all products or a filtered list of products
+func (s *ProductsOp) List(ctx context.Context, opt ProductsListOptions) (*ProductsList, *http.Response, error) {
+	path := productsPath
+	path, err := addOptions(path, opt)
 	if err != nil {
-		return nil, resp, err
+		return nil, nil, err
 	}
 
-	return products, resp, err
+	return s.list(ctx, path)
 }

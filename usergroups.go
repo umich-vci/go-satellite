@@ -24,11 +24,11 @@ type UserGroup struct {
 // UserGroupCreate defines model for the body of the creation of a user group.
 type UserGroupCreate struct {
 	UserGroup struct {
-		Name         string `json:"name"`
-		Admin        *bool  `json:"admin,omitempty"`
-		UserIDs      *[]int `json:"user_ids,omitempty"`
-		UserGroupIDs *[]int `json:"usergroup_ids,omitempty"`
-		RoleIDs      *[]int `json:"role_ids,omitempty"`
+		Name         *string `json:"name"`
+		Admin        *bool   `json:"admin,omitempty"`
+		UserIDs      *[]int  `json:"user_ids,omitempty"`
+		UserGroupIDs *[]int  `json:"usergroup_ids,omitempty"`
+		RoleIDs      *[]int  `json:"role_ids,omitempty"`
 	} `json:"usergroup"`
 }
 
@@ -46,10 +46,10 @@ type UserGroupUpdate struct {
 // UserGroups is an interface for interacting with
 // Red Hat Satellite roles
 type UserGroups interface {
-	CreateUserGroup(ctx context.Context, userGroupCreate UserGroupCreate) (*UserGroup, *http.Response, error)
-	DeleteUserGroup(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error)
-	GetUserGroupByID(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error)
-	UpdateUserGroup(ctx context.Context, userGroupID int, userGroupUpdate UserGroupUpdate) (*UserGroup, *http.Response, error)
+	Create(ctx context.Context, userGroupCreate UserGroupCreate) (*UserGroup, *http.Response, error)
+	Delete(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error)
+	Get(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error)
+	Update(ctx context.Context, userGroupID int, userGroupUpdate UserGroupUpdate) (*UserGroup, *http.Response, error)
 }
 
 // UserGroupsOp handles communication with the User Group related methods of the
@@ -58,8 +58,8 @@ type UserGroupsOp struct {
 	client *Client
 }
 
-// CreateUserGroup creates a user group
-func (s *UserGroupsOp) CreateUserGroup(ctx context.Context, userGroupCreate UserGroupCreate) (*UserGroup, *http.Response, error) {
+// Create a user group
+func (s *UserGroupsOp) Create(ctx context.Context, userGroupCreate UserGroupCreate) (*UserGroup, *http.Response, error) {
 	path := rolesPath
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, userGroupCreate)
@@ -76,8 +76,8 @@ func (s *UserGroupsOp) CreateUserGroup(ctx context.Context, userGroupCreate User
 	return userGroup, resp, err
 }
 
-// DeleteUserGroup deletes a user group by its ID
-func (s *UserGroupsOp) DeleteUserGroup(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error) {
+// Delete a user group by its ID
+func (s *UserGroupsOp) Delete(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d", rolesPath, userGroupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
@@ -94,8 +94,8 @@ func (s *UserGroupsOp) DeleteUserGroup(ctx context.Context, userGroupID int) (*U
 	return userGroup, resp, err
 }
 
-// GetUserGroupByID gets a single role by its ID
-func (s *UserGroupsOp) GetUserGroupByID(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error) {
+// Get a single user group by its ID
+func (s *UserGroupsOp) Get(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d", rolesPath, userGroupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
@@ -112,8 +112,8 @@ func (s *UserGroupsOp) GetUserGroupByID(ctx context.Context, userGroupID int) (*
 	return userGroup, resp, err
 }
 
-// UpdateUserGroup updates a user group
-func (s *UserGroupsOp) UpdateUserGroup(ctx context.Context, userGroupID int, userGroupUpdate UserGroupUpdate) (*UserGroup, *http.Response, error) {
+// Update a user group
+func (s *UserGroupsOp) Update(ctx context.Context, userGroupID int, userGroupUpdate UserGroupUpdate) (*UserGroup, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d", rolesPath, userGroupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, userGroupUpdate)

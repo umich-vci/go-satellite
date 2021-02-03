@@ -2,8 +2,8 @@ package gosatellite
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"strconv"
 )
 
 const rolesPath = basePath + "/roles"
@@ -44,10 +44,10 @@ type RoleUpdate struct {
 // Roles is an interface for interacting with
 // Red Hat Satellite roles
 type Roles interface {
-	CreateRole(ctx context.Context, roleCreate RoleCreate) (*Role, *http.Response, error)
-	DeleteRole(ctx context.Context, roleID int) (*http.Response, error)
-	GetRoleByID(ctx context.Context, roleID int) (*Role, *http.Response, error)
-	UpdateRole(ctx context.Context, roleID int, roleUpdate RoleUpdate) (*Role, *http.Response, error)
+	Create(ctx context.Context, roleCreate RoleCreate) (*Role, *http.Response, error)
+	Delete(ctx context.Context, roleID int) (*http.Response, error)
+	Get(ctx context.Context, roleID int) (*Role, *http.Response, error)
+	Update(ctx context.Context, roleID int, roleUpdate RoleUpdate) (*Role, *http.Response, error)
 }
 
 // RolesOp handles communication with the Role related methods of the
@@ -56,8 +56,8 @@ type RolesOp struct {
 	client *Client
 }
 
-// CreateRole creates a new role
-func (s *RolesOp) CreateRole(ctx context.Context, roleCreate RoleCreate) (*Role, *http.Response, error) {
+// Create a new role
+func (s *RolesOp) Create(ctx context.Context, roleCreate RoleCreate) (*Role, *http.Response, error) {
 	path := rolesPath
 
 	if roleCreate.Role.Name == nil {
@@ -81,9 +81,10 @@ func (s *RolesOp) CreateRole(ctx context.Context, roleCreate RoleCreate) (*Role,
 	return role, resp, err
 }
 
-// DeleteRole deletes a single role by its ID
-func (s *RolesOp) DeleteRole(ctx context.Context, roleID int) (*http.Response, error) {
-	path := rolesPath + "/" + strconv.Itoa(roleID)
+// Delete a single role by its ID
+func (s *RolesOp) Delete(ctx context.Context, roleID int) (*http.Response, error) {
+	path := fmt.Sprintf("%s/%d", rolesPath, roleID)
+
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
 		return nil, err
@@ -97,9 +98,10 @@ func (s *RolesOp) DeleteRole(ctx context.Context, roleID int) (*http.Response, e
 	return resp, err
 }
 
-// GetRoleByID gets a single role by its ID
-func (s *RolesOp) GetRoleByID(ctx context.Context, roleID int) (*Role, *http.Response, error) {
-	path := rolesPath + "/" + strconv.Itoa(roleID)
+// Get a single role by its ID
+func (s *RolesOp) Get(ctx context.Context, roleID int) (*Role, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", rolesPath, roleID)
+
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -114,9 +116,9 @@ func (s *RolesOp) GetRoleByID(ctx context.Context, roleID int) (*Role, *http.Res
 	return role, resp, err
 }
 
-// UpdateRole updates a role
-func (s *RolesOp) UpdateRole(ctx context.Context, roleID int, roleUpdate RoleUpdate) (*Role, *http.Response, error) {
-	path := rolesPath + "/" + strconv.Itoa(roleID)
+// Update a role
+func (s *RolesOp) Update(ctx context.Context, roleID int, roleUpdate RoleUpdate) (*Role, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", rolesPath, roleID)
 
 	if roleUpdate.Role.Name != nil {
 		if *roleUpdate.Role.Name == "" {

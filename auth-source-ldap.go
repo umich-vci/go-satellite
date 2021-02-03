@@ -57,6 +57,9 @@ type AuthSourceLDAPsListOptions struct {
 // AuthSourceLDAPs is an interface for interacting with
 // Red Hat Satellite Auth Source LDAPs
 type AuthSourceLDAPs interface {
+	List(ctx context.Context, opt *AuthSourceLDAPsListOptions) (*AuthSourceLDAPList, *http.Response, error)
+	ListByLocationID(ctx context.Context, locID int, opt *AuthSourceLDAPsListOptions) (*AuthSourceLDAPList, *http.Response, error)
+	ListByOrganizationID(ctx context.Context, orgID int, opt *AuthSourceLDAPsListOptions) (*AuthSourceLDAPList, *http.Response, error)
 }
 
 // AuthSourceLDAPsOp handles communication with the LDAP authentication source related methods of the
@@ -82,7 +85,7 @@ func (s *AuthSourceLDAPsOp) list(ctx context.Context, path string) (*AuthSourceL
 }
 
 // List all LDAP Authentication Sources or a filtered list of LDAP Authentication Sources
-func (s *AuthSourceLDAPsOp) List(ctx context.Context, opt *ListOptions) (*AuthSourceLDAPList, *http.Response, error) {
+func (s *AuthSourceLDAPsOp) List(ctx context.Context, opt *AuthSourceLDAPsListOptions) (*AuthSourceLDAPList, *http.Response, error) {
 	path := authSourceLDAPsPath
 	path, err := addOptions(path, opt)
 	if err != nil {
@@ -93,7 +96,7 @@ func (s *AuthSourceLDAPsOp) List(ctx context.Context, opt *ListOptions) (*AuthSo
 }
 
 // ListByLocationID all LDAP Authentication Sources or a filtered list of LDAP Authentication Sources
-func (s *AuthSourceLDAPsOp) ListByLocationID(ctx context.Context, locID int, opt *ListOptions) (*AuthSourceLDAPList, *http.Response, error) {
+func (s *AuthSourceLDAPsOp) ListByLocationID(ctx context.Context, locID int, opt *AuthSourceLDAPsListOptions) (*AuthSourceLDAPList, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d/auth_source_ldaps", locationsPath, locID)
 	path, err := addOptions(path, opt)
 	if err != nil {
@@ -104,7 +107,7 @@ func (s *AuthSourceLDAPsOp) ListByLocationID(ctx context.Context, locID int, opt
 }
 
 // ListByOrganizationID all LDAP Authentication Sources or a filtered list of LDAP Authentication Sources
-func (s *AuthSourceLDAPsOp) ListByOrganizationID(ctx context.Context, orgID int, opt *ListOptions) (*AuthSourceLDAPList, *http.Response, error) {
+func (s *AuthSourceLDAPsOp) ListByOrganizationID(ctx context.Context, orgID int, opt *AuthSourceLDAPsListOptions) (*AuthSourceLDAPList, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d/auth_source_ldaps", organizationsPath, orgID)
 	path, err := addOptions(path, opt)
 	if err != nil {

@@ -2,8 +2,8 @@ package gosatellite
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"strconv"
 )
 
 const hostCollectionsPath = katelloBasePath + "/host_collections"
@@ -55,15 +55,15 @@ type HostCollectionsOp struct {
 // HostCollections is an interface for interacting with
 // Red Hat Satellite Host Collections
 type HostCollections interface {
-	CreateHostCollection(ctx context.Context, orgID int, hcCreate HostCollectionCreate) (*HostCollection, *http.Response, error)
-	DeleteHostCollection(ctx context.Context, hcID int) (*http.Response, error)
-	GetHostCollectionByID(ctx context.Context, hcID int) (*HostCollection, *http.Response, error)
-	UpdateHostCollection(ctx context.Context, hcID int, hcUpdate HostCollectionUpdate) (*HostCollection, *http.Response, error)
+	Create(ctx context.Context, orgID int, hcCreate HostCollectionCreate) (*HostCollection, *http.Response, error)
+	Delete(ctx context.Context, hcID int) (*http.Response, error)
+	Get(ctx context.Context, hcID int) (*HostCollection, *http.Response, error)
+	Update(ctx context.Context, hcID int, hcUpdate HostCollectionUpdate) (*HostCollection, *http.Response, error)
 }
 
-// CreateHostCollection creates a new host collection
-func (s *HostCollectionsOp) CreateHostCollection(ctx context.Context, orgID int, hcCreate HostCollectionCreate) (*HostCollection, *http.Response, error) {
-	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID) + "/host_collections"
+// Create a new host collection
+func (s *HostCollectionsOp) Create(ctx context.Context, orgID int, hcCreate HostCollectionCreate) (*HostCollection, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d/host_collections", katelloOrganizationsPath, orgID)
 
 	if hcCreate.Name == "" {
 		return nil, nil, NewArgError("hcCreate.Name", "cannot be empty")
@@ -82,9 +82,9 @@ func (s *HostCollectionsOp) CreateHostCollection(ctx context.Context, orgID int,
 	return hc, resp, err
 }
 
-// DeleteHostCollection deletes a host collection
-func (s *HostCollectionsOp) DeleteHostCollection(ctx context.Context, hcID int) (*http.Response, error) {
-	path := hostCollectionsPath + "/" + strconv.Itoa(hcID)
+// Delete a host collection
+func (s *HostCollectionsOp) Delete(ctx context.Context, hcID int) (*http.Response, error) {
+	path := fmt.Sprintf("%s/%d", hostCollectionsPath, hcID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
@@ -99,9 +99,9 @@ func (s *HostCollectionsOp) DeleteHostCollection(ctx context.Context, hcID int) 
 	return resp, err
 }
 
-// GetHostCollectionByID gets a host collection by it's ID
-func (s *HostCollectionsOp) GetHostCollectionByID(ctx context.Context, hcID int) (*HostCollection, *http.Response, error) {
-	path := hostCollectionsPath + "/" + strconv.Itoa(hcID)
+// Get a host collection by its ID
+func (s *HostCollectionsOp) Get(ctx context.Context, hcID int) (*HostCollection, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", hostCollectionsPath, hcID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
@@ -117,9 +117,9 @@ func (s *HostCollectionsOp) GetHostCollectionByID(ctx context.Context, hcID int)
 	return hc, resp, err
 }
 
-// UpdateHostCollection updates a host collection
-func (s *HostCollectionsOp) UpdateHostCollection(ctx context.Context, hcID int, hcUpdate HostCollectionUpdate) (*HostCollection, *http.Response, error) {
-	path := hostCollectionsPath + "/" + strconv.Itoa(hcID)
+// Update a host collection
+func (s *HostCollectionsOp) Update(ctx context.Context, hcID int, hcUpdate HostCollectionUpdate) (*HostCollection, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", hostCollectionsPath, hcID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, hcUpdate)
 	if err != nil {

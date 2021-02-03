@@ -2,8 +2,8 @@ package gosatellite
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"strconv"
 )
 
 const katelloOrganizationsPath = katelloBasePath + "/organizations"
@@ -161,10 +161,10 @@ type OrganizationUpdate struct {
 // Organizations is an interface for interacting with
 // Red Hat Satellite organizations
 type Organizations interface {
-	CreateOrganization(ctx context.Context, orgCreate OrganizationCreate) (*Organization, *http.Response, error)
-	DeleteOrganization(ctx context.Context, orgID int) (*http.Response, error)
-	GetOrganizationByID(ctx context.Context, orgID int) (*Organization, *http.Response, error)
-	UpdateOrganization(ctx context.Context, orgID int, update OrganizationUpdate) (*Organization, *http.Response, error)
+	Create(ctx context.Context, orgCreate OrganizationCreate) (*Organization, *http.Response, error)
+	Delete(ctx context.Context, orgID int) (*http.Response, error)
+	Get(ctx context.Context, orgID int) (*Organization, *http.Response, error)
+	Update(ctx context.Context, orgID int, update OrganizationUpdate) (*Organization, *http.Response, error)
 }
 
 // OrganizationsOp handles communication with the Organization related methods of the
@@ -173,8 +173,8 @@ type OrganizationsOp struct {
 	client *Client
 }
 
-// CreateOrganization creates a new organization
-func (s *OrganizationsOp) CreateOrganization(ctx context.Context, orgCreate OrganizationCreate) (*Organization, *http.Response, error) {
+// Create a new organization
+func (s *OrganizationsOp) Create(ctx context.Context, orgCreate OrganizationCreate) (*Organization, *http.Response, error) {
 	path := katelloOrganizationsPath
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, orgCreate)
@@ -190,9 +190,9 @@ func (s *OrganizationsOp) CreateOrganization(ctx context.Context, orgCreate Orga
 	return org, resp, err
 }
 
-// DeleteOrganization deletes an organization by its ID
-func (s *OrganizationsOp) DeleteOrganization(ctx context.Context, orgID int) (*http.Response, error) {
-	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID)
+// Delete an organization by its ID
+func (s *OrganizationsOp) Delete(ctx context.Context, orgID int) (*http.Response, error) {
+	path := fmt.Sprintf("%s/%d", katelloOrganizationsPath, orgID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
@@ -206,9 +206,10 @@ func (s *OrganizationsOp) DeleteOrganization(ctx context.Context, orgID int) (*h
 	return resp, err
 }
 
-// GetOrganizationByID gets a single Organization by its ID
-func (s *OrganizationsOp) GetOrganizationByID(ctx context.Context, orgID int) (*Organization, *http.Response, error) {
-	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID)
+// Get a single Organization by its ID
+func (s *OrganizationsOp) Get(ctx context.Context, orgID int) (*Organization, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", katelloOrganizationsPath, orgID)
+
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -223,9 +224,9 @@ func (s *OrganizationsOp) GetOrganizationByID(ctx context.Context, orgID int) (*
 	return org, resp, err
 }
 
-// UpdateOrganization the settings of an organization by its ID
-func (s *OrganizationsOp) UpdateOrganization(ctx context.Context, orgID int, update OrganizationUpdate) (*Organization, *http.Response, error) {
-	path := katelloOrganizationsPath + "/" + strconv.Itoa(orgID)
+// Update the settings of an organization by its ID
+func (s *OrganizationsOp) Update(ctx context.Context, orgID int, update OrganizationUpdate) (*Organization, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", katelloOrganizationsPath, orgID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, update)
 	if err != nil {

@@ -24,8 +24,8 @@ type ExternalUserGroup2 struct {
 // ExternalUserGroupCreate defines model for the body of the creation of an external user group.
 type ExternalUserGroupCreate struct {
 	ExternalUserGroup struct {
-		Name         string `json:"name"`
-		AuthSourceID int    `json:"auth_source_id"`
+		Name         *string `json:"name"`
+		AuthSourceID *int    `json:"auth_source_id"`
 	} `json:"external_usergroup"`
 }
 

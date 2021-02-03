@@ -2,8 +2,8 @@ package gosatellite
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"strconv"
 )
 
 const repositoriesPath = katelloBasePath + "/repositories"
@@ -140,31 +140,77 @@ type RepositoriesList struct {
 	Results *[]Repository `json:"results"`
 }
 
-// RepositorySearch defines model for searching a list of repositories.
-type RepositorySearch struct {
-	OrganizationID          *int    `json:"organization_id,omitempty"`
-	SubscriptionID          *int    `json:"subscription_id,omitempty"`
-	Name                    *string `json:"name,omitempty"`
-	Enabled                 *bool   `json:"enabled,omitempty"`
-	Custom                  *bool   `json:"custom,omitempty"`
-	RedHatOnly              *bool   `json:"redhat_only,omitempty"`
-	IncludeAvailableContent *bool   `json:"include_available_content,omitempty"`
-	SyncPlanID              *int    `json:"sync_plan_id,omitempty"`
-	AvailableFor            *string `json:"available_for,omitempty"`
-	Search                  *string `json:"search,omitempty"`
-	Page                    *int    `json:"page,omitempty"`
-	PerPage                 *int    `json:"per_page,omitempty"`
-	Order                   *string `json:"order,omitempty"`
-	FullResult              *bool   `json:"full_result,omitempty"`
-	SortBy                  *string `json:"sort_by,omitempty"`
-	SortOrder               *string `json:"sort_order,omitempty"`
+// RepositoriesListOptions specifies the optional parameters to various List methods that
+// support pagination.
+type RepositoriesListOptions struct {
+	KatelloListOptions
+
+	// ID of an organization to show repositories in
+	OrganizationID int `url:"organization_id,omitempty"`
+
+	// ID of a product to show repositories of
+	ProductID int `url:"product_id,omitempty"`
+
+	// ID of an environment to show repositories in
+	EnvironmentID int `url:"environment_id,omitempty"`
+
+	// ID of a content view to show repositories in
+	ContentViewID int `url:"content_view_id,omitempty"`
+
+	// ID of a content view version to show repositories in
+	ContentViewVersionID int `url:"content_view_version_id,omitempty"`
+
+	// Id of a deb package to find repositories that contain the deb
+	DebID int `url:"deb_id,omitempty"`
+
+	// Id of an erratum to find repositories that contain the erratum
+	ErratumID int `url:"erratum_id,omitempty"`
+
+	// Id of a rpm package to find repositories that contain the rpm
+	RpmID int `url:"rpm_id,omitempty"`
+
+	// Id of a file to find repositories that contain the file
+	FileID int `url:"file_id,omitempty"`
+
+	// Id of an ansible collection to find repositories that contain the ansible collection
+	AnsibleCollectionID int `url:"ansible_collection_id,omitempty"`
+
+	// Id of an ostree branch to find repositories that contain that branch
+	OSTreeBranchID int `url:"ostree_branch_id,omitempty"`
+
+	// show repositories in Library and the default content view
+	Library bool `url:"library,omitempty"`
+
+	// show archived repositories
+	Archived bool `url:"archived,omitempty"`
+
+	// limit to only repositories of this type
+	// Must be one of: puppet, deb, ansible_collection, ostree, docker, yum, file.
+	ContentType string `url:"content_type,omitempty"`
+
+	// name of the repository
+	Name string `url:"name,omitempty"`
+
+	// label of the repository
+	Label string `url:"label,omitempty"`
+
+	// description of the repository
+	Description string `url:"description,omitempty"`
+
+	// interpret specified object to return only Repositories that can be associated with specified object.
+	// Only 'content_view' & 'content_view_version' are supported.
+	AvailableFor string `url:"available_for,omitempty"`
+
+	// only repositories having at least one of the specified content type ex: rpm , erratum
+	// Must be one of: puppet_module, deb, ansible collection, ostree, docker_manifest, docker_manifest_list, docker_tag, docker_blob, rpm, modulemd, erratum, distribution, package_category, package_group, yum_repo_metadata_file, srpm, file.
+	WithContent string `url:"with_content,omitempty"`
 }
 
 // Repositories is an interface for interacting with
 // Red Hat Satellite repositories
 type Repositories interface {
-	GetRepositoryByID(ctx context.Context, repoID int) (*Repository, *http.Response, error)
-	ListRepositories(ctx context.Context, prodSearch ProductSearch) (*ProductsList, *http.Response, error)
+	Get(ctx context.Context, repoID int) (*Repository, *http.Response, error)
+	List(ctx context.Context, opt RepositoriesListOptions) (*RepositoriesList, *http.Response, error)
 }
 
 // RepositoriesOp handles communication with the Repository related methods of the
@@ -173,9 +219,10 @@ type RepositoriesOp struct {
 	client *Client
 }
 
-// GetRepositoryByID gets a single repository by its ID
-func (s *RepositoriesOp) GetRepositoryByID(ctx context.Context, repoID int) (*Repository, *http.Response, error) {
-	path := repositoriesPath + "/" + strconv.Itoa(repoID)
+// Get a single repository by its ID
+func (s *RepositoriesOp) Get(ctx context.Context, repoID int) (*Repository, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", repositoriesPath, repoID)
+
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -190,20 +237,24 @@ func (s *RepositoriesOp) GetRepositoryByID(ctx context.Context, repoID int) (*Re
 	return repo, resp, err
 }
 
-// ListRepositories gets all repositories or a filtered list of repositories
-func (s *RepositoriesOp) ListRepositories(ctx context.Context, prodSearch ProductSearch) (*ProductsList, *http.Response, error) {
-	path := productsPath
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, prodSearch)
+// List all repositories or a filtered list of repositories
+func (s *RepositoriesOp) List(ctx context.Context, opt RepositoriesListOptions) (*RepositoriesList, *http.Response, error) {
+	path := repositoriesPath
+	path, err := addOptions(path, opt)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	products := new(ProductsList)
-	resp, err := s.client.Do(ctx, req, products)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repositories := new(RepositoriesList)
+	resp, err := s.client.Do(ctx, req, repositories)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return products, resp, err
+	return repositories, resp, err
 }

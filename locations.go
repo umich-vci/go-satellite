@@ -2,8 +2,8 @@ package gosatellite
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"strconv"
 )
 
 const locationsPath = basePath + "/locations"
@@ -41,6 +41,18 @@ type Location struct {
 type LocationsList struct {
 	searchResults
 	Results *[]Location `json:"results"`
+}
+
+// LocationsListOptions specifies the optional parameters to various List methods that
+// support pagination.
+type LocationsListOptions struct {
+	ListOptions
+
+	// Scope by locations
+	LocationID int `url:"location_id,omitempty"`
+
+	// Scope by organizations
+	OrganizationID int `url:"organization_id,omitempty"`
 }
 
 // LocationCreate defines model for creating a location.
@@ -87,22 +99,14 @@ type LocationUpdate struct {
 	} `json:"location,omitempty"`
 }
 
-// LocationsSearch defines model for searching a list of locations.
-type LocationsSearch struct {
-	Search  *string `json:"search,omitempty"`
-	Order   *string `json:"order,omitempty"`
-	Page    *int    `json:"page,omitempty"`
-	PerPage *int    `json:"per_page,omitempty"`
-}
-
 // Locations is an interface for interacting with
 // Red Hat Satellite Locations
 type Locations interface {
-	CreateLocation(ctx context.Context, locCreate LocationCreate) (*Location, *http.Response, error)
-	DeleteLocation(ctx context.Context, locationID int) (*http.Response, error)
-	GetLocationByID(ctx context.Context, locationID int) (*Location, *http.Response, error)
-	ListLocations(ctx context.Context, locSearch LocationsSearch) (*LocationsList, *http.Response, error)
-	UpdateLocation(ctx context.Context, locationID int, update LocationUpdate) (*Location, *http.Response, error)
+	Create(ctx context.Context, locCreate LocationCreate) (*Location, *http.Response, error)
+	Delete(ctx context.Context, locationID int) (*http.Response, error)
+	Get(ctx context.Context, locationID int) (*Location, *http.Response, error)
+	List(ctx context.Context, opt LocationsListOptions) (*LocationsList, *http.Response, error)
+	Update(ctx context.Context, locationID int, update LocationUpdate) (*Location, *http.Response, error)
 }
 
 // LocationsOp handles communication with the Locations related methods of the
@@ -111,8 +115,8 @@ type LocationsOp struct {
 	client *Client
 }
 
-// CreateLocation creates a new location
-func (s *LocationsOp) CreateLocation(ctx context.Context, locCreate LocationCreate) (*Location, *http.Response, error) {
+// Create a new location
+func (s *LocationsOp) Create(ctx context.Context, locCreate LocationCreate) (*Location, *http.Response, error) {
 	path := locationsPath
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, locCreate)
@@ -128,9 +132,9 @@ func (s *LocationsOp) CreateLocation(ctx context.Context, locCreate LocationCrea
 	return location, resp, err
 }
 
-// DeleteLocation deletes a location by its ID
-func (s *LocationsOp) DeleteLocation(ctx context.Context, locationID int) (*http.Response, error) {
-	path := locationsPath + "/" + strconv.Itoa(locationID)
+// Delete a location by its ID
+func (s *LocationsOp) Delete(ctx context.Context, locationID int) (*http.Response, error) {
+	path := fmt.Sprintf("%s/%d", locationsPath, locationID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
@@ -144,9 +148,9 @@ func (s *LocationsOp) DeleteLocation(ctx context.Context, locationID int) (*http
 	return resp, err
 }
 
-// GetLocationByID gets a single location by its ID
-func (s *LocationsOp) GetLocationByID(ctx context.Context, locationID int) (*Location, *http.Response, error) {
-	path := locationsPath + "/" + strconv.Itoa(locationID)
+// Get a single location by its ID
+func (s *LocationsOp) Get(ctx context.Context, locationID int) (*Location, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", locationsPath, locationID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
@@ -162,11 +166,15 @@ func (s *LocationsOp) GetLocationByID(ctx context.Context, locationID int) (*Loc
 	return location, resp, err
 }
 
-// ListLocations gets all locations or a filtered list of locations
-func (s *LocationsOp) ListLocations(ctx context.Context, locSearch LocationsSearch) (*LocationsList, *http.Response, error) {
+// List all locations or a filtered list of locations
+func (s *LocationsOp) List(ctx context.Context, opt LocationsListOptions) (*LocationsList, *http.Response, error) {
 	path := locationsPath
+	path, err := addOptions(path, opt)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, locSearch)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -180,9 +188,9 @@ func (s *LocationsOp) ListLocations(ctx context.Context, locSearch LocationsSear
 	return locations, resp, err
 }
 
-// UpdateLocation the settings of a location by its ID
-func (s *LocationsOp) UpdateLocation(ctx context.Context, locationID int, update LocationUpdate) (*Location, *http.Response, error) {
-	path := locationsPath + "/" + strconv.Itoa(locationID)
+// Update the settings of a location by its ID
+func (s *LocationsOp) Update(ctx context.Context, locationID int, update LocationUpdate) (*Location, *http.Response, error) {
+	path := fmt.Sprintf("%s/%d", locationsPath, locationID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, update)
 	if err != nil {
