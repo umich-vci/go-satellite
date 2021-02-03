@@ -90,8 +90,8 @@ type ProductsListOptions struct {
 // Products is an interface for interacting with
 // Red Hat Satellite products
 type Products interface {
-	ListByOrgID(ctx context.Context, orgID int, opt ProductsListOptions) (*ProductsList, *http.Response, error)
-	List(ctx context.Context, opt ProductsListOptions) (*ProductsList, *http.Response, error)
+	ListByOrgID(ctx context.Context, orgID int, opt *ProductsListOptions) (*ProductsList, *http.Response, error)
+	List(ctx context.Context, opt *ProductsListOptions) (*ProductsList, *http.Response, error)
 }
 
 // ProductsOp handles communication with the Product related methods of the
@@ -117,7 +117,7 @@ func (s *ProductsOp) list(ctx context.Context, path string) (*ProductsList, *htt
 }
 
 // ListByOrgID all products or a filtered list of products for a specific organization
-func (s *ProductsOp) ListByOrgID(ctx context.Context, orgID int, opt ProductsListOptions) (*ProductsList, *http.Response, error) {
+func (s *ProductsOp) ListByOrgID(ctx context.Context, orgID int, opt *ProductsListOptions) (*ProductsList, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d/products", katelloOrganizationsPath, orgID)
 	path, err := addOptions(path, opt)
 	if err != nil {
@@ -128,7 +128,7 @@ func (s *ProductsOp) ListByOrgID(ctx context.Context, orgID int, opt ProductsLis
 }
 
 // List all products or a filtered list of products
-func (s *ProductsOp) List(ctx context.Context, opt ProductsListOptions) (*ProductsList, *http.Response, error) {
+func (s *ProductsOp) List(ctx context.Context, opt *ProductsListOptions) (*ProductsList, *http.Response, error) {
 	path := productsPath
 	path, err := addOptions(path, opt)
 	if err != nil {

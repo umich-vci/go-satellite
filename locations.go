@@ -105,7 +105,7 @@ type Locations interface {
 	Create(ctx context.Context, locCreate LocationCreate) (*Location, *http.Response, error)
 	Delete(ctx context.Context, locationID int) (*http.Response, error)
 	Get(ctx context.Context, locationID int) (*Location, *http.Response, error)
-	List(ctx context.Context, opt LocationsListOptions) (*LocationsList, *http.Response, error)
+	List(ctx context.Context, opt *LocationsListOptions) (*LocationsList, *http.Response, error)
 	Update(ctx context.Context, locationID int, update LocationUpdate) (*Location, *http.Response, error)
 }
 
@@ -167,7 +167,7 @@ func (s *LocationsOp) Get(ctx context.Context, locationID int) (*Location, *http
 }
 
 // List all locations or a filtered list of locations
-func (s *LocationsOp) List(ctx context.Context, opt LocationsListOptions) (*LocationsList, *http.Response, error) {
+func (s *LocationsOp) List(ctx context.Context, opt *LocationsListOptions) (*LocationsList, *http.Response, error) {
 	path := locationsPath
 	path, err := addOptions(path, opt)
 	if err != nil {

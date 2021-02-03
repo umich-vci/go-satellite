@@ -155,9 +155,9 @@ type ActivationKeys interface {
 	Delete(ctx context.Context, akID int) (*http.Response, error)
 	DisassociateHostCollections(ctx context.Context, akID int, hostCollections []int) (*ActivationKey, *http.Response, error)
 	Get(ctx context.Context, akID int) (*ActivationKey, *http.Response, error)
-	List(ctx context.Context, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error)
-	ListByEnvironmentID(ctx context.Context, envID int, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error)
-	ListByOrganizationID(ctx context.Context, orgID int, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error)
+	List(ctx context.Context, opt *ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error)
+	ListByEnvironmentID(ctx context.Context, envID int, opt *ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error)
+	ListByOrganizationID(ctx context.Context, orgID int, opt *ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error)
 	ListReleases(ctx context.Context, akID int) (*ActivationKeyReleasesList, *http.Response, error)
 	Update(ctx context.Context, akID int, akUpdate ActivationKeyUpdate) (*ActivationKey, *http.Response, error)
 	UnattachSubscription(ctx context.Context, akID int, subscriptionID int) (*ActivationKey, *http.Response, error)
@@ -348,7 +348,7 @@ func (s *ActivationKeysOp) list(ctx context.Context, path string) (*ActivationKe
 }
 
 // List all activation keys or a filtered list of activation keys
-func (s *ActivationKeysOp) List(ctx context.Context, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error) {
+func (s *ActivationKeysOp) List(ctx context.Context, opt *ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error) {
 	path := activationKeyPath
 
 	if opt.OrganizationID == 0 && opt.EnvironmentID == 0 {
@@ -383,7 +383,7 @@ func (s *ActivationKeysOp) List(ctx context.Context, opt ActivationKeyListOption
 // }
 
 // ListByEnvironmentID gets all activation keys or a filtered list of activation keys for a specific environment
-func (s *ActivationKeysOp) ListByEnvironmentID(ctx context.Context, envID int, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error) {
+func (s *ActivationKeysOp) ListByEnvironmentID(ctx context.Context, envID int, opt *ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d/activation_keys", katelloEnvironmentsPath, envID)
 	path, err := addOptions(path, opt)
 	if err != nil {
@@ -394,7 +394,7 @@ func (s *ActivationKeysOp) ListByEnvironmentID(ctx context.Context, envID int, o
 }
 
 // ListByOrganizationID gets all activation keys or a filtered list of activation keys for a specific organization
-func (s *ActivationKeysOp) ListByOrganizationID(ctx context.Context, orgID int, opt ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error) {
+func (s *ActivationKeysOp) ListByOrganizationID(ctx context.Context, orgID int, opt *ActivationKeyListOptions) (*ActivationKeyList, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d/activation_keys", katelloOrganizationsPath, orgID)
 	path, err := addOptions(path, opt)
 	if err != nil {

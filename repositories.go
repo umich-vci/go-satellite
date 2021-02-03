@@ -210,7 +210,7 @@ type RepositoriesListOptions struct {
 // Red Hat Satellite repositories
 type Repositories interface {
 	Get(ctx context.Context, repoID int) (*Repository, *http.Response, error)
-	List(ctx context.Context, opt RepositoriesListOptions) (*RepositoriesList, *http.Response, error)
+	List(ctx context.Context, opt *RepositoriesListOptions) (*RepositoriesList, *http.Response, error)
 }
 
 // RepositoriesOp handles communication with the Repository related methods of the
@@ -238,7 +238,7 @@ func (s *RepositoriesOp) Get(ctx context.Context, repoID int) (*Repository, *htt
 }
 
 // List all repositories or a filtered list of repositories
-func (s *RepositoriesOp) List(ctx context.Context, opt RepositoriesListOptions) (*RepositoriesList, *http.Response, error) {
+func (s *RepositoriesOp) List(ctx context.Context, opt *RepositoriesListOptions) (*RepositoriesList, *http.Response, error) {
 	path := repositoriesPath
 	path, err := addOptions(path, opt)
 	if err != nil {
