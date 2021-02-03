@@ -54,7 +54,7 @@ type ExternalUserGroupsOp struct {
 
 // Create an external user group linked to a user group
 func (s *ExternalUserGroupsOp) Create(ctx context.Context, userGroupID int, externalUserGroupCreate ExternalUserGroupCreate) (*ExternalUserGroup, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d/external_usergroups", rolesPath, userGroupID)
+	path := fmt.Sprintf("%s/%d/external_usergroups", userGroupsPath, userGroupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, externalUserGroupCreate)
 	if err != nil {
@@ -72,7 +72,7 @@ func (s *ExternalUserGroupsOp) Create(ctx context.Context, userGroupID int, exte
 
 // Delete an external user group by its ID
 func (s *ExternalUserGroupsOp) Delete(ctx context.Context, userGroupID int, externalUserGroupID int) (*ExternalUserGroup2, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d/external_usergroups/%d", rolesPath, userGroupID, externalUserGroupID)
+	path := fmt.Sprintf("%s/%d/external_usergroups/%d", userGroupsPath, userGroupID, externalUserGroupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
 	if err != nil {
@@ -90,7 +90,7 @@ func (s *ExternalUserGroupsOp) Delete(ctx context.Context, userGroupID int, exte
 
 // Get an external user group by its ID
 func (s *ExternalUserGroupsOp) Get(ctx context.Context, userGroupID int, externalUserGroupID int) (*ExternalUserGroup, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d/external_usergroups/%d", rolesPath, userGroupID, externalUserGroupID)
+	path := fmt.Sprintf("%s/%d/external_usergroups/%d", userGroupsPath, userGroupID, externalUserGroupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
@@ -108,7 +108,7 @@ func (s *ExternalUserGroupsOp) Get(ctx context.Context, userGroupID int, externa
 
 // Update an external user group
 func (s *ExternalUserGroupsOp) Update(ctx context.Context, userGroupID int, externalUserGroupID int, externalUserGroupUpdate ExternalUserGroupUpdate) (*ExternalUserGroup, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d/external_usergroups/%d", rolesPath, userGroupID, externalUserGroupID)
+	path := fmt.Sprintf("%s/%d/external_usergroups/%d", userGroupsPath, userGroupID, externalUserGroupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, externalUserGroupUpdate)
 	if err != nil {

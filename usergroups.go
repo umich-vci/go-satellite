@@ -60,7 +60,7 @@ type UserGroupsOp struct {
 
 // Create a user group
 func (s *UserGroupsOp) Create(ctx context.Context, userGroupCreate UserGroupCreate) (*UserGroup, *http.Response, error) {
-	path := rolesPath
+	path := userGroupsPath
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, userGroupCreate)
 	if err != nil {
@@ -78,7 +78,7 @@ func (s *UserGroupsOp) Create(ctx context.Context, userGroupCreate UserGroupCrea
 
 // Delete a user group by its ID
 func (s *UserGroupsOp) Delete(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d", rolesPath, userGroupID)
+	path := fmt.Sprintf("%s/%d", userGroupsPath, userGroupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
 	if err != nil {
@@ -96,7 +96,7 @@ func (s *UserGroupsOp) Delete(ctx context.Context, userGroupID int) (*UserGroup,
 
 // Get a single user group by its ID
 func (s *UserGroupsOp) Get(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d", rolesPath, userGroupID)
+	path := fmt.Sprintf("%s/%d", userGroupsPath, userGroupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
@@ -114,7 +114,7 @@ func (s *UserGroupsOp) Get(ctx context.Context, userGroupID int) (*UserGroup, *h
 
 // Update a user group
 func (s *UserGroupsOp) Update(ctx context.Context, userGroupID int, userGroupUpdate UserGroupUpdate) (*UserGroup, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d", rolesPath, userGroupID)
+	path := fmt.Sprintf("%s/%d", userGroupsPath, userGroupID)
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, path, userGroupUpdate)
 	if err != nil {
