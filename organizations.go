@@ -114,6 +114,17 @@ type Organization struct {
 	Users     *[]genericUser `json:"users"`
 }
 
+// OrganizationShort defines model for an Organization.
+type OrganizationShort struct {
+	CreatedAt   *string `json:"created_at"`
+	Description *string `json:"description"`
+	ID          *int    `json:"id"`
+	Label       *string `json:"label"`
+	Name        *string `json:"name"`
+	Title       *string `json:"title"`
+	UpdatedAt   *string `json:"updated_at"`
+}
+
 // OrganizationCreate defines model for OrganizationCreate.
 type OrganizationCreate struct {
 	Organization struct {
@@ -158,12 +169,32 @@ type OrganizationUpdate struct {
 	RedhatRepositoryURL *string `json:"redhat_repository_url,omitempty"`
 }
 
+// OrganizationsList defines model for a list of organizations.
+type OrganizationsList struct {
+	searchResults
+	Error   *string              `json:"error"`
+	Results *[]OrganizationShort `json:"results"`
+}
+
+// OrganizationsListOptions specifies the optional parameters to various List methods that
+// support pagination.
+type OrganizationsListOptions struct {
+	KatelloListOptions
+
+	// Set the current location context for the request
+	LocationID int `url:"location_id,omitempty"`
+
+	// Set the current organization context for the request
+	OrganizationID int `url:"organization_id,omitempty"`
+}
+
 // Organizations is an interface for interacting with
 // Red Hat Satellite organizations
 type Organizations interface {
 	Create(ctx context.Context, orgCreate OrganizationCreate) (*Organization, *http.Response, error)
 	Delete(ctx context.Context, orgID int) (*http.Response, error)
 	Get(ctx context.Context, orgID int) (*Organization, *http.Response, error)
+	List(ctx context.Context, opt *OrganizationsListOptions) (*OrganizationsList, *http.Response, error)
 	Update(ctx context.Context, orgID int, update OrganizationUpdate) (*Organization, *http.Response, error)
 }
 
@@ -222,6 +253,28 @@ func (s *OrganizationsOp) Get(ctx context.Context, orgID int) (*Organization, *h
 	}
 
 	return org, resp, err
+}
+
+// List all organizations or a filtered list of organizations
+func (s *OrganizationsOp) List(ctx context.Context, opt *OrganizationsListOptions) (*OrganizationsList, *http.Response, error) {
+	path := katelloOrganizationsPath
+	path, err := addOptions(path, opt)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	orgs := new(OrganizationsList)
+	resp, err := s.client.Do(ctx, req, orgs)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return orgs, resp, err
 }
 
 // Update the settings of an organization by its ID
