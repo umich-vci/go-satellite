@@ -21,21 +21,6 @@ type UserGroup struct {
 	Roles              *[]genericRole      `json:"roles"`
 }
 
-// ExternalUserGroup defines model for an External User Group.
-type ExternalUserGroup struct {
-	ID             *int                   `json:"id"`
-	Name           *string                `json:"name"`
-	AuthSourceLDAP *genericAuthSourceLDAP `json:"auth_source_ldap"`
-}
-
-// ExternalUserGroup2 defines model for an External User Group.
-type ExternalUserGroup2 struct {
-	ID           *int    `json:"id"`
-	Name         *string `json:"name"`
-	AuthSourceID *int    `json:"auth_source_id"`
-	UserGroupID  *int    `json:"usergroup_id"`
-}
-
 // UserGroupCreate defines model for the body of the creation of a user group.
 type UserGroupCreate struct {
 	UserGroup struct {
@@ -45,22 +30,6 @@ type UserGroupCreate struct {
 		UserGroupIDs *[]int `json:"usergroup_ids,omitempty"`
 		RoleIDs      *[]int `json:"role_ids,omitempty"`
 	} `json:"usergroup"`
-}
-
-// ExternalUserGroupCreate defines model for the body of the creation of an external user group.
-type ExternalUserGroupCreate struct {
-	ExternalUserGroup struct {
-		Name         string `json:"name"`
-		AuthSourceID int    `json:"auth_source_id"`
-	} `json:"external_usergroup"`
-}
-
-// ExternalUserGroupUpdate defines model for the body of the update of an external user group.
-type ExternalUserGroupUpdate struct {
-	ExternalUserGroup struct {
-		Name         *string `json:"name,omitempty"`
-		AuthSourceID *int    `json:"auth_source_id,omitempty"`
-	} `json:"external_usergroup"`
 }
 
 // UserGroupUpdate defines model for the body of the update of a user group.
@@ -77,13 +46,9 @@ type UserGroupUpdate struct {
 // UserGroups is an interface for interacting with
 // Red Hat Satellite roles
 type UserGroups interface {
-	CreateExternalUserGroup(ctx context.Context, userGroupID int, externalUserGroupCreate ExternalUserGroupCreate) (*ExternalUserGroup, *http.Response, error)
 	CreateUserGroup(ctx context.Context, userGroupCreate UserGroupCreate) (*UserGroup, *http.Response, error)
-	DeleteExternalUserGroup(ctx context.Context, userGroupID int, externalUserGroupID int) (*ExternalUserGroup2, *http.Response, error)
 	DeleteUserGroup(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error)
-	GetExternalUserGroupByID(ctx context.Context, userGroupID int, externalUserGroupID int) (*ExternalUserGroup, *http.Response, error)
 	GetUserGroupByID(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error)
-	UpdateExternalUserGroup(ctx context.Context, userGroupID int, externalUserGroupID int, externalUserGroupUpdate ExternalUserGroupUpdate) (*ExternalUserGroup, *http.Response, error)
 	UpdateUserGroup(ctx context.Context, userGroupID int, userGroupUpdate UserGroupUpdate) (*UserGroup, *http.Response, error)
 }
 
@@ -91,24 +56,6 @@ type UserGroups interface {
 // Red Hat Satellite REST API
 type UserGroupsOp struct {
 	client *Client
-}
-
-// CreateExternalUserGroup creates an external user group linked to a user group
-func (s *UserGroupsOp) CreateExternalUserGroup(ctx context.Context, userGroupID int, externalUserGroupCreate ExternalUserGroupCreate) (*ExternalUserGroup, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d/external_usergroups", rolesPath, userGroupID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodPost, path, externalUserGroupCreate)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	externalUserGroup := new(ExternalUserGroup)
-	resp, err := s.client.Do(ctx, req, externalUserGroup)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return externalUserGroup, resp, err
 }
 
 // CreateUserGroup creates a user group
@@ -129,24 +76,6 @@ func (s *UserGroupsOp) CreateUserGroup(ctx context.Context, userGroupCreate User
 	return userGroup, resp, err
 }
 
-// DeleteExternalUserGroup deletes an external user group by its ID
-func (s *UserGroupsOp) DeleteExternalUserGroup(ctx context.Context, userGroupID int, externalUserGroupID int) (*ExternalUserGroup2, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d/external_usergroups/%d", rolesPath, userGroupID, externalUserGroupID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	externalUserGroup := new(ExternalUserGroup2)
-	resp, err := s.client.Do(ctx, req, externalUserGroup)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return externalUserGroup, resp, err
-}
-
 // DeleteUserGroup deletes a user group by its ID
 func (s *UserGroupsOp) DeleteUserGroup(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d", rolesPath, userGroupID)
@@ -165,24 +94,6 @@ func (s *UserGroupsOp) DeleteUserGroup(ctx context.Context, userGroupID int) (*U
 	return userGroup, resp, err
 }
 
-// GetExternalUserGroupByID gets a external user group by its ID
-func (s *UserGroupsOp) GetExternalUserGroupByID(ctx context.Context, userGroupID int, externalUserGroupID int) (*ExternalUserGroup, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d/external_usergroups/%d", rolesPath, userGroupID, externalUserGroupID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	externalUserGroup := new(ExternalUserGroup)
-	resp, err := s.client.Do(ctx, req, externalUserGroup)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return externalUserGroup, resp, err
-}
-
 // GetUserGroupByID gets a single role by its ID
 func (s *UserGroupsOp) GetUserGroupByID(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d", rolesPath, userGroupID)
@@ -199,24 +110,6 @@ func (s *UserGroupsOp) GetUserGroupByID(ctx context.Context, userGroupID int) (*
 	}
 
 	return userGroup, resp, err
-}
-
-// UpdateExternalUserGroup updates a user group
-func (s *UserGroupsOp) UpdateExternalUserGroup(ctx context.Context, userGroupID int, externalUserGroupID int, externalUserGroupUpdate ExternalUserGroupUpdate) (*ExternalUserGroup, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d/external_usergroups/%d", rolesPath, userGroupID, externalUserGroupID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodPut, path, externalUserGroupUpdate)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	externalUserGroup := new(ExternalUserGroup)
-	resp, err := s.client.Do(ctx, req, externalUserGroup)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return externalUserGroup, resp, err
 }
 
 // UpdateUserGroup updates a user group
