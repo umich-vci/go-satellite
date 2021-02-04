@@ -80,7 +80,7 @@ func (s *UserGroupsOp) Create(ctx context.Context, userGroupCreate UserGroupCrea
 func (s *UserGroupsOp) Delete(ctx context.Context, userGroupID int) (*UserGroup, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d", userGroupsPath, userGroupID)
 
-	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -74,7 +74,7 @@ func (s *ExternalUserGroupsOp) Create(ctx context.Context, userGroupID int, exte
 func (s *ExternalUserGroupsOp) Delete(ctx context.Context, userGroupID int, externalUserGroupID int) (*ExternalUserGroup2, *http.Response, error) {
 	path := fmt.Sprintf("%s/%d/external_usergroups/%d", userGroupsPath, userGroupID, externalUserGroupID)
 
-	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
