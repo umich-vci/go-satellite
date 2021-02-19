@@ -129,7 +129,7 @@ func (s *ContentViewsOp) List(ctx context.Context, opt *ContentViewsListOptions)
 
 // ListByOrganizationID all Content Views in an organization or a filtered list of Content Views in an organization
 func (s *ContentViewsOp) ListByOrganizationID(ctx context.Context, orgID int, opt *ContentViewsListOptions) (*ContentViewsList, *http.Response, error) {
-	path := fmt.Sprintf("%s/%d/environments", katelloOrganizationsPath, orgID)
+	path := fmt.Sprintf("%s/%d/content_views", katelloOrganizationsPath, orgID)
 	path, err := addOptions(path, opt)
 	if err != nil {
 		return nil, nil, err
