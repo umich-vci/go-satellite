@@ -50,19 +50,20 @@ type Client struct {
 	UserAgent string
 
 	// Services used for communicating with the API
-	ActivationKeys     ActivationKeys
-	AuthSourceLDAPs    AuthSourceLDAPs
-	ExternalUserGroups ExternalUserGroups
-	Filters            Filters
-	HostCollections    HostCollections
-	Locations          Locations
-	Manifests          Manifests
-	Organizations      Organizations
-	Permissions        Permissions
-	Products           Products
-	Repositories       Repositories
-	Roles              Roles
-	UserGroups         UserGroups
+	ActivationKeys        ActivationKeys
+	AuthSourceLDAPs       AuthSourceLDAPs
+	ExternalUserGroups    ExternalUserGroups
+	Filters               Filters
+	HostCollections       HostCollections
+	LifecycleEnvironments LifecycleEnvironments
+	Locations             Locations
+	Manifests             Manifests
+	Organizations         Organizations
+	Permissions           Permissions
+	Products              Products
+	Repositories          Repositories
+	Roles                 Roles
+	UserGroups            UserGroups
 
 	// Optional function called after every successful request made to the Red Hat Satellite APIs
 	onRequestCompleted RequestCompletionCallback
@@ -162,6 +163,7 @@ func NewClient(config *Config) (*Client, error) {
 	c.ExternalUserGroups = &ExternalUserGroupsOp{client: c}
 	c.Filters = &FiltersOp{client: c}
 	c.HostCollections = &HostCollectionsOp{client: c}
+	c.LifecycleEnvironments = &LifecycleEnvironmentsOp{client: c}
 	c.Locations = &LocationsOp{client: c}
 	c.Manifests = &ManifestsOp{client: c}
 	c.Organizations = &OrganizationsOp{client: c}
