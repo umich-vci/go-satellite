@@ -56,14 +56,14 @@ type ContentView struct {
 	UpdatedAt              *string            `json:"updated_at"`
 	Environments           *[]shortLE         `json:"environments"`
 	Repositories           *[]shortRepository `json:"repositories"`
-	//puppet_modules   *[]environments `json:"puppet_modules"`
-	Versions *[]cvVersions `json:"versions"`
-	//components   *[]environments `json:"components"`
-	//content_view_components   *[]environments `json:"content_view_components"`
-	ActivationKeys *[]genericShortRef `json:"activation_keys"`
-	NextVersion    *string            `json:"next_version"`
-	LastPublished  *string            `json:"last_published"`
-	Permissions    *cvPermissions     `json:"permissions"`
+	Versions               *[]cvVersions      `json:"versions"`
+	ActivationKeys         *[]genericShortRef `json:"activation_keys"`
+	NextVersion            *string            `json:"next_version"`
+	LastPublished          *string            `json:"last_published"`
+	Permissions            *cvPermissions     `json:"permissions"`
+	//PuppetModules          *[]unknown         `json:"puppet_modules"`
+	//Components             *[]unknown         `json:"components"`
+	//ContentViewComponents  *[]unknown         `json:"content_view_components"`
 }
 
 type cvVersions struct {
