@@ -96,3 +96,19 @@ type genericAuthSourceLDAP struct {
 	Type *string `json:"type"`
 	Name *string `json:"name"`
 }
+
+type shortLE struct {
+	ID          *int    `json:"id"`
+	Name        *string `json:"name"`
+	Label       *string `json:"label"`
+	Permissions struct {
+		Readable *bool `json:"readable"`
+	} `json:"permissions"`
+}
+
+type shortRepository struct {
+	ID          *int    `json:"id"`
+	Name        *string `json:"name"`
+	Label       *string `json:"label"`
+	ContentType *string `json:"content_type"`
+}

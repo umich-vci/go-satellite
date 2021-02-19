@@ -52,6 +52,7 @@ type Client struct {
 	// Services used for communicating with the API
 	ActivationKeys        ActivationKeys
 	AuthSourceLDAPs       AuthSourceLDAPs
+	ContentViews          ContentViews
 	ExternalUserGroups    ExternalUserGroups
 	Filters               Filters
 	HostCollections       HostCollections
@@ -160,6 +161,7 @@ func NewClient(config *Config) (*Client, error) {
 	c := &Client{client: http.DefaultClient, BaseURL: baseURL, UserAgent: userAgent, Config: config}
 	c.ActivationKeys = &ActivationKeysOp{client: c}
 	c.AuthSourceLDAPs = &AuthSourceLDAPsOp{client: c}
+	c.ContentViews = &ContentViewsOp{client: c}
 	c.ExternalUserGroups = &ExternalUserGroupsOp{client: c}
 	c.Filters = &FiltersOp{client: c}
 	c.HostCollections = &HostCollectionsOp{client: c}
