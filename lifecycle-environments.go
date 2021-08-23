@@ -74,7 +74,7 @@ type lePermissions struct {
 // LifecycleEnvironmentsList defines model for a list of Lifecycle Environments.
 type LifecycleEnvironmentsList struct {
 	searchResults
-	Results *[]AuthSourceLDAP `json:"results"`
+	Results *[]LifecycleEnvironment `json:"results"`
 }
 
 // LifecycleEnvironments is an interface for interacting with
